@@ -1,6 +1,9 @@
 packages:
   - "apps/*"
   - "packages/*"
+allowBuilds:
+  '@prisma/engines': true
+  prisma: true
 minimumReleaseAgeExclude:
   - '@inquirer/checkbox@5.2.3'
   - '@inquirer/confirm@6.3.0'
