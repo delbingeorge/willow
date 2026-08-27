@@ -1,0 +1,5 @@
+{
+  "name": "@willow/shared",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts"
+}
