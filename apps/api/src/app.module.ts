@@ -8,12 +8,14 @@ import { AppResolver } from './app.resolver.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { JwtAuthGuard } from './modules/auth/jwt-auth.guard.js';
+import { DocumentModule } from './modules/document/document.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
 @Module({
   imports: [
     PrismaModule,
     AuthModule,
+    DocumentModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'schema.graphql'),
