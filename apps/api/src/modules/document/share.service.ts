@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { DocumentService } from './document.service.js';
+import { snapshotYjsContent } from './yjs-snapshot.js';
 
 const VALID_ROLES = ['viewer', 'editor'];
 
@@ -94,6 +95,28 @@ export class ShareService {
       data: { isPublished: false },
       include: { creator: true },
     });
+  }
+
+  async findByToken(token: string) {
+    const share = await this.prisma.documentShare.findUnique({
+      where: { token },
+      include: { document: true },
+    });
+
+    if (!share || !share.document.isPublished) {
+      throw new NotFoundException('Shared document not found');
+    }
+
+    const content = await snapshotYjsContent(this.prisma, share.document.id);
+
+    return {
+      id: share.document.id,
+      title: share.document.title,
+      icon: share.document.icon,
+      coverUrl: share.document.coverUrl,
+      content,
+      updatedAt: share.document.updatedAt,
+    };
   }
 
   private async findOwnedShare(orgId: string, shareId: string) {
