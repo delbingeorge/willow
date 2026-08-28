@@ -23,6 +23,8 @@ model User {
     
     memberships   Membership[]
     documents     Document[] @relation("Creator")
+    versions      DocumentVersion[] @relation("VersionCreator")
+    shares        DocumentShare[]
 
     @@map("users")
   }
@@ -74,6 +76,8 @@ model User {
       parent       Document?         @relation("DocumentTree", fields: [parentId], references: [id])
       children     Document[]        @relation("DocumentTree")
       yjsState     DocumentYjsState?
+      versions     DocumentVersion[]
+      shares       DocumentShare[]
 
       @@index([orgId])
       @@index([parentId])
@@ -90,4 +94,36 @@ model User {
       document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
       @@map("document_yjs_states")
+    }
+
+  model DocumentVersion {
+      id         String   @id @default(uuid())
+      documentId String   @map("document_id")
+      version    Int
+      title      String   @db.VarChar(500)
+      content    Json
+      createdBy  String   @map("created_by")
+      createdAt  DateTime @default(now()) @map("created_at")
+
+      document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+      creator  User     @relation("VersionCreator", fields: [createdBy], references: [id])
+
+      @@unique([documentId, version])
+      @@index([documentId])
+      @@map("document_versions")
+    }
+
+  model DocumentShare {
+      id         String   @id @default(uuid())
+      documentId String   @map("document_id")
+      userId     String?  @map("user_id")
+      role       String   @default("viewer") @db.VarChar(20)
+      token      String?  @unique @db.VarChar(100)
+      createdAt  DateTime @default(now()) @map("created_at")
+
+      document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+      user     User?    @relation(fields: [userId], references: [id])
+
+      @@unique([documentId, userId])
+      @@map("document_shares")
     }
