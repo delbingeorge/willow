@@ -15,11 +15,19 @@ import { DocumentService } from './document.service.js';
 import { CreateDocumentInput } from './dto/create-document.input.js';
 import { UpdateDocumentInput } from './dto/update-document.input.js';
 import { DocumentModel } from './models/document.model.js';
+import { DocumentShareModel } from './models/document-share.model.js';
+import { DocumentVersionModel } from './models/document-version.model.js';
 import { SearchResultModel } from './models/search-result.model.js';
+import { ShareService } from './share.service.js';
+import { VersionService } from './version.service.js';
 
 @Resolver(() => DocumentModel)
 export class DocumentResolver {
-  constructor(private readonly documentService: DocumentService) {}
+  constructor(
+    private readonly documentService: DocumentService,
+    private readonly shareService: ShareService,
+    private readonly versionService: VersionService,
+  ) {}
 
   @Query(() => [DocumentModel])
   documents(
@@ -119,6 +127,30 @@ export class DocumentResolver {
     return this.documentService.move(user.orgId, id, parentId, position);
   }
 
+  @Mutation(() => DocumentVersionModel)
+  createVersion(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('documentId', { type: () => ID }) documentId: string,
+  ) {
+    return this.versionService.create(user.orgId, user.id, documentId);
+  }
+
+  @Mutation(() => DocumentModel)
+  publishDocument(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('documentId', { type: () => ID }) documentId: string,
+  ) {
+    return this.shareService.publish(user.orgId, documentId);
+  }
+
+  @Mutation(() => DocumentModel)
+  unpublishDocument(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('documentId', { type: () => ID }) documentId: string,
+  ) {
+    return this.shareService.unpublish(user.orgId, documentId);
+  }
+
   @ResolveField('createdBy', () => UserModel)
   createdBy(@Parent() document: { creator: UserModel }) {
     return document.creator;
@@ -132,5 +164,34 @@ export class DocumentResolver {
   @ResolveField('childCount', () => Int)
   childCount(@Parent() document: { id: string }) {
     return this.documentService.countChildren(document.id);
+  }
+
+  @ResolveField('versions', () => [DocumentVersionModel])
+  versions(
+    @Parent() document: { id: string },
+    @Args('limit', { type: () => Int, nullable: true }) limit?: number,
+    @Args('offset', { type: () => Int, nullable: true }) offset?: number,
+  ) {
+    return this.versionService.findMany(document.id, limit, offset);
+  }
+
+  @ResolveField('currentVersion', () => Int)
+  currentVersion(@Parent() document: { id: string }) {
+    return this.versionService.currentVersion(document.id);
+  }
+
+  @ResolveField('shares', () => [DocumentShareModel])
+  shares(@Parent() document: { id: string }) {
+    return this.shareService.findByDocument(document.id);
+  }
+
+  @ResolveField('shareLink', () => String, { nullable: true })
+  async shareLink(@Parent() document: { id: string; isPublished: boolean }) {
+    if (!document.isPublished) {
+      return null;
+    }
+
+    const share = await this.shareService.findPublicShare(document.id);
+    return share?.token ? `/shared/${share.token}` : null;
   }
 }
