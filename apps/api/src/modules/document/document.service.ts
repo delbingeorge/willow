@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import * as Y from 'yjs';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import type { CreateDocumentInput } from './dto/create-document.input.js';
 import type { UpdateDocumentInput } from './dto/update-document.input.js';
@@ -6,6 +7,14 @@ import type { UpdateDocumentInput } from './dto/update-document.input.js';
 interface DocumentFilters {
   parentId?: string | null;
   isArchived?: boolean;
+}
+
+export interface SearchRow {
+  id: string;
+  title: string;
+  icon: string | null;
+  updatedAt: Date;
+  snippet: string | null;
 }
 
 @Injectable()
@@ -177,5 +186,38 @@ export class DocumentService {
 
       current = doc?.parentId ?? null;
     }
+  }
+
+  async importState(orgId: string, id: string, base64State: string) {
+    await this.findOne(orgId, id);
+
+    const state = Buffer.from(base64State, 'base64');
+
+    try {
+      Y.applyUpdate(new Y.Doc(), state);
+    } catch {
+      throw new BadRequestException('Invalid Yjs document state');
+    }
+
+    await this.prisma.documentYjsState.upsert({
+      where: { documentId: id },
+      create: { documentId: id, state },
+      update: { state },
+    });
+
+    return true;
+  }
+
+  search(orgId: string, query: string) {
+    return this.prisma.$queryRaw<SearchRow[]>`
+      SELECT id, title, icon, updated_at AS "updatedAt",
+             ts_headline('english', title, plainto_tsquery('english', ${query})) AS snippet
+      FROM documents
+      WHERE org_id = ${orgId}
+        AND is_archived = false
+        AND to_tsvector('english', title) @@ plainto_tsquery('english', ${query})
+      ORDER BY ts_rank(to_tsvector('english', title), plainto_tsquery('english', ${query})) DESC
+      LIMIT 20
+    `;
   }
 }

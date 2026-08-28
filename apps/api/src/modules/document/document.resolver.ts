@@ -15,6 +15,7 @@ import { DocumentService } from './document.service.js';
 import { CreateDocumentInput } from './dto/create-document.input.js';
 import { UpdateDocumentInput } from './dto/update-document.input.js';
 import { DocumentModel } from './models/document.model.js';
+import { SearchResultModel } from './models/search-result.model.js';
 
 @Resolver(() => DocumentModel)
 export class DocumentResolver {
@@ -42,6 +43,20 @@ export class DocumentResolver {
   @Query(() => [DocumentModel])
   documentTree(@CurrentUser() user: AuthenticatedUser) {
     return this.documentService.findTree(user.orgId);
+  }
+
+  @Query(() => [SearchResultModel])
+  search(@CurrentUser() user: AuthenticatedUser, @Args('query') query: string) {
+    return this.documentService.search(user.orgId, query);
+  }
+
+  @Mutation(() => Boolean)
+  importDocumentState(
+    @CurrentUser() user: AuthenticatedUser,
+    @Args('id', { type: () => ID }) id: string,
+    @Args('state') state: string,
+  ) {
+    return this.documentService.importState(user.orgId, id, state);
   }
 
   @Mutation(() => DocumentModel)
