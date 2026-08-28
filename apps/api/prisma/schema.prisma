@@ -22,6 +22,7 @@ model User {
     updatedAt DateTime @updatedAt @map("updated_at")
     
     memberships   Membership[]
+    documents     Document[] @relation("Creator")
 
     @@map("users")
   }
@@ -36,6 +37,7 @@ model User {
       updatedAt DateTime @updatedAt @map("updated_at")
 
       memberships Membership[]
+      documents   Document[]
 
       @@map("organizations")
     }
@@ -51,4 +53,29 @@ model User {
 
       @@unique([userId, orgId])
       @@map("memberships")
+    }
+
+  model Document {
+      id          String   @id @default(uuid())
+      orgId       String   @map("org_id")
+      createdBy   String   @map("created_by")
+      title       String   @default("Untitled") @db.VarChar(500)
+      icon        String?  @db.VarChar(10)
+      coverUrl    String?  @map("cover_url") @db.VarChar(500)
+      parentId    String?  @map("parent_id")
+      position    Int      @default(0)
+      isArchived  Boolean  @default(false) @map("is_archived")
+      isPublished Boolean  @default(false) @map("is_published")
+      createdAt   DateTime @default(now()) @map("created_at")
+      updatedAt   DateTime @updatedAt @map("updated_at")
+
+      organization Organization @relation(fields: [orgId], references: [id])
+      creator      User         @relation("Creator", fields: [createdBy], references: [id])
+      parent       Document?    @relation("DocumentTree", fields: [parentId], references: [id])
+      children     Document[]  @relation("DocumentTree")
+
+      @@index([orgId])
+      @@index([parentId])
+      @@index([orgId, isArchived])
+      @@map("documents")
     }
