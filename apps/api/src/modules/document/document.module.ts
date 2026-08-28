@@ -9,5 +9,6 @@ import { VersionService } from './version.service.js';
 @Module({
   controllers: [ShareController],
   providers: [DocumentResolver, DocumentService, ShareResolver, ShareService, VersionService],
+  exports: [VersionService],
 })
 export class DocumentModule {}

@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Server } from '@hocuspocus/server';
 import * as Y from 'yjs';
 import { AuthService } from '../auth/auth.service.js';
+import { VersionService } from '../document/version.service.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 
 interface CollabJwtPayload {
@@ -18,6 +19,7 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly authService: AuthService,
+    private readonly versionService: VersionService,
   ) {}
 
   async onModuleInit() {
@@ -57,6 +59,14 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
           create: { documentId: documentName, state },
           update: { state },
         });
+
+        await this.versionService.createAutoVersionIfDue(documentName);
+      },
+
+      onDisconnect: async ({ documentName, clientsCount }) => {
+        if (clientsCount === 0) {
+          await this.versionService.createAutoVersionOnDisconnect(documentName);
+        }
       },
     });
 
