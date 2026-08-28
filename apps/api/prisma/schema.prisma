@@ -69,13 +69,25 @@ model User {
       createdAt   DateTime @default(now()) @map("created_at")
       updatedAt   DateTime @updatedAt @map("updated_at")
 
-      organization Organization @relation(fields: [orgId], references: [id])
-      creator      User         @relation("Creator", fields: [createdBy], references: [id])
-      parent       Document?    @relation("DocumentTree", fields: [parentId], references: [id])
-      children     Document[]  @relation("DocumentTree")
+      organization Organization      @relation(fields: [orgId], references: [id])
+      creator      User              @relation("Creator", fields: [createdBy], references: [id])
+      parent       Document?         @relation("DocumentTree", fields: [parentId], references: [id])
+      children     Document[]        @relation("DocumentTree")
+      yjsState     DocumentYjsState?
 
       @@index([orgId])
       @@index([parentId])
       @@index([orgId, isArchived])
       @@map("documents")
+    }
+
+  model DocumentYjsState {
+      id         String   @id @default(uuid())
+      documentId String   @unique @map("document_id")
+      state      Bytes
+      updatedAt  DateTime @updatedAt @map("updated_at")
+
+      document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+      @@map("document_yjs_states")
     }
