@@ -1,6 +1,7 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service.js';
+import type { AuthenticatedUser } from './types/authenticated-user.js';
 
 const DEV_USER_EMAIL = 'dev@willow.local';
 const DEV_USER_NAME = 'Dev User';
@@ -23,6 +24,25 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync({ sub: user.id });
 
     return { accessToken, user };
+  }
+
+  async resolveAuthenticatedUser(userId: string): Promise<AuthenticatedUser> {
+    const membership = await this.prisma.membership.findFirst({
+      where: { userId },
+      include: { user: true },
+    });
+
+    if (!membership) {
+      throw new UnauthorizedException();
+    }
+
+    return {
+      id: membership.user.id,
+      email: membership.user.email,
+      name: membership.user.name,
+      orgId: membership.orgId,
+      role: membership.role,
+    };
   }
 
   private async getOrCreateDevUser() {

@@ -18,5 +18,6 @@ const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
