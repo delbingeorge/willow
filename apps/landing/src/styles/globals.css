@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-open-runde);
+
+  --color-background: var(--color-neutral-950);
+  --color-fg-3: var(--color-neutral-400);
+  --color-fg-4: var(--color-white);
+  --color-bg-3: var(--color-neutral-800);
+  --color-purple-2: var(--color-violet-300);
+  --color-purple-4: var(--color-violet-500);
+}
