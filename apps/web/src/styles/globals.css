@@ -19,3 +19,50 @@
   --color-fg-4: var(--color-white);
   --color-bg-3: var(--color-neutral-800);
 }
+
+.ProseMirror {
+  outline: none;
+  min-height: 200px;
+  color: var(--color-fg-4);
+}
+
+.ProseMirror p {
+  margin: 0.5em 0;
+}
+
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3 {
+  font-weight: 600;
+  margin: 1em 0 0.5em;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5em;
+}
+
+.collaboration-carets__caret {
+  position: relative;
+  margin-left: -1px;
+  margin-right: -1px;
+  border-left: 1px solid;
+  border-right: 1px solid;
+  word-break: normal;
+  pointer-events: none;
+}
+
+.collaboration-carets__label {
+  position: absolute;
+  top: -1.4em;
+  left: -1px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  user-select: none;
+  white-space: nowrap;
+  color: var(--color-white);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px 3px 3px 0;
+  pointer-events: none;
+}

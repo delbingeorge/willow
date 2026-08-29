@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import { RootLayout } from "@/app/root-layout";
 import { DocumentPlaceholder } from "@/features/documents/components/document-placeholder";
-import { DocumentDetailStub } from "@/features/documents/components/document-detail-stub";
+import { DocumentEditorPage } from "@/features/editor/components/document-editor-page";
 
 export const router = createBrowserRouter([
   {
@@ -9,7 +9,7 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, element: <DocumentPlaceholder /> },
-      { path: "documents/:id", element: <DocumentDetailStub /> },
+      { path: "documents/:id", element: <DocumentEditorPage /> },
     ],
   },
 ]);
