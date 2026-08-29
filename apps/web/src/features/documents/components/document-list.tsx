@@ -1,69 +1,124 @@
-import { useNavigate } from "react-router";
-import { DocumentAddIcon } from "@solar-icons/react/bold/document-add";
-import { PenNewSquareIcon } from "@solar-icons/react/bold/pen-new-square";
-import { useDocumentTree } from "@/features/documents/hooks/use-document-tree";
+import { useLocation, useNavigate } from "react-router";
+import { PenNewSquareIcon } from "@solar-icons/react/outline/pen-new-square";
+import { AddCircleIcon } from "@solar-icons/react/outline/add-circle";
 import { useCreateDocument } from "@/features/documents/hooks/use-create-document";
-import { DocumentCard } from "@/features/documents/components/document-card";
-import { LocalDocumentList } from "@/features/local-docs/components/local-document-list";
-import { createLocalDocument } from "@/features/local-docs/lib/local-doc-store";
 import { useAuth } from "@/shared/providers/auth-provider";
-import { buttonVariants } from "@/shared/components/ui/button";
+import { useDocumentTree } from "@/features/documents/hooks/use-document-tree";
+import { useArchivedDocuments } from "@/features/documents/hooks/use-archived-documents";
+import { useDocumentScope } from "@/features/documents/hooks/use-document-scope";
+import { useLocalDocuments } from "@/features/local-docs/hooks/use-local-documents";
+import {
+  createLocalDocument,
+  deleteLocalDocument,
+} from "@/features/local-docs/lib/local-doc-store";
+import {
+  selectScopedDocuments,
+  buildDocumentTree,
+} from "@/features/documents/lib/scoped-documents";
+import { SCOPE_LABELS } from "@/features/documents/lib/document-scope";
+import { DocumentRow } from "@/features/documents/components/document-row";
+import { DocumentTree } from "@/features/documents/components/document-tree";
+
+const TREE_SCOPES = new Set(["all", "cloud"]);
 
 export function DocumentList() {
   const { isAuthenticated } = useAuth();
-  const { data, isLoading, isError } = useDocumentTree();
+  const { scope } = useDocumentScope();
+  const { data: cloud, isLoading, isError } = useDocumentTree();
+  const { data: archived } = useArchivedDocuments();
+  const local = useLocalDocuments();
   const createDocument = useCreateDocument();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const rootDocuments = data?.filter((document) => document.parentId === null) ?? [];
+  const asTree = TREE_SCOPES.has(scope);
+
+  const documents = asTree
+    ? []
+    : selectScopedDocuments({
+        scope,
+        cloud: cloud ?? [],
+        local,
+        archived: archived ?? [],
+      });
+
+  const treeNodes = asTree
+    ? buildDocumentTree(cloud ?? [], scope === "all" ? local : [])
+    : [];
+
+  const isEmpty = asTree ? treeNodes.length === 0 : documents.length === 0;
+
+  const handleDelete = async (id: string, title: string) => {
+    if (!window.confirm(`Delete "${title}" from this device?`)) {
+      return;
+    }
+    await deleteLocalDocument(id);
+    if (location.pathname === `/documents/${id}`) {
+      void navigate("/");
+    }
+  };
 
   return (
-    <div className="flex h-full flex-col gap-3">
-      <button
-        type="button"
-        onClick={() => {
-          const document = createLocalDocument();
-          void navigate(`/documents/${document.id}`);
-        }}
-        className={buttonVariants({
-          variant: "secondary",
-          className: "w-full justify-start",
-        })}
-      >
-        <PenNewSquareIcon size={16} />
-        New draft
-      </button>
-
-      {isAuthenticated && (
-        <>
+    <div className="flex h-full flex-col">
+      <header className="flex h-10 shrink-0 items-center justify-between border-b border-border pr-1.5 pl-2.5">
+        <span className="truncate text-[13px] font-medium text-ink-muted">
+          {SCOPE_LABELS[scope]}
+        </span>
+        <span className="flex shrink-0 items-center gap-0.5">
+          {isAuthenticated && (
+            <button
+              type="button"
+              onClick={() => createDocument.mutate()}
+              disabled={createDocument.isPending}
+              aria-label="New cloud document"
+              title="New cloud document"
+              className="flex h-6 w-6 items-center justify-center rounded text-ink-subtle transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-50"
+            >
+              <AddCircleIcon size={15} />
+            </button>
+          )}
           <button
             type="button"
-            onClick={() => createDocument.mutate()}
-            disabled={createDocument.isPending}
-            className={buttonVariants({
-              variant: "secondary",
-              className: "w-full justify-start",
-            })}
+            onClick={() => {
+              const document = createLocalDocument();
+              void navigate(`/documents/${document.id}`);
+            }}
+            aria-label="New draft"
+            title="New draft"
+            className="flex h-6 w-6 items-center justify-center rounded text-ink-subtle transition-colors hover:bg-surface-hover hover:text-ink"
           >
-            <DocumentAddIcon size={16} />
-            New cloud document
+            <PenNewSquareIcon size={15} />
           </button>
+        </span>
+      </header>
 
-          {isLoading && <p className="p-2 text-sm text-fg-3">Loading…</p>}
-          {isError && <p className="p-2 text-sm text-fg-3">Couldn&apos;t load documents.</p>}
+      <div className="flex-1 overflow-y-auto p-1">
+        {isAuthenticated && isLoading && (
+          <p className="px-2.5 py-3 text-[13px] text-ink-subtle">Loading…</p>
+        )}
+        {isAuthenticated && isError && (
+          <p className="px-2.5 py-3 text-[13px] text-ink-subtle">Couldn&apos;t load documents.</p>
+        )}
+        {isEmpty && !isLoading && (
+          <p className="px-2.5 py-3 text-[13px] text-ink-subtle">Nothing here yet.</p>
+        )}
 
-          {rootDocuments.length > 0 && (
-            <div className="flex flex-col gap-1.5">
-              <p className="px-1 text-xs font-medium text-fg-3">Workspace</p>
-              {rootDocuments.map((document) => (
-                <DocumentCard key={document.id} document={document} />
-              ))}
-            </div>
-          )}
-        </>
-      )}
-
-      <LocalDocumentList />
+        {asTree ? (
+          <DocumentTree nodes={treeNodes} />
+        ) : (
+          documents.map((document) => (
+            <DocumentRow
+              key={document.id}
+              document={document}
+              onDelete={
+                document.kind === "local"
+                  ? () => void handleDelete(document.id, document.title)
+                  : undefined
+              }
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 }

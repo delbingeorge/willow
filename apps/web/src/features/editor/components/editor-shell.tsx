@@ -34,11 +34,17 @@ export function EditorShell({
 
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">
-      <EditorTitleInput ydoc={ydoc} readOnly={readOnly} onPersist={onPersistTitle} />
-      {notice && <p className="mb-2 text-xs text-fg-3">{notice}</p>}
-      {!readOnly && <EditorBubbleMenu editor={editor} />}
-      {!readOnly && <EditorDragHandle editor={editor} />}
-      <EditorContent editor={editor} />
+      <div className="mx-auto w-full max-w-[720px] px-12 py-10">
+        <EditorTitleInput ydoc={ydoc} readOnly={readOnly} onPersist={onPersistTitle} />
+        {notice && (
+          <p className="mb-4 inline-flex items-center rounded-md bg-surface-active px-2 py-1 text-[12px] text-ink-muted">
+            {notice}
+          </p>
+        )}
+        {!readOnly && <EditorBubbleMenu editor={editor} />}
+        {!readOnly && <EditorDragHandle editor={editor} />}
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }

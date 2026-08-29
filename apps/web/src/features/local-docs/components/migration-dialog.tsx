@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { DocumentIcon } from "@solar-icons/react/bold/document";
+import { DocumentIcon } from "@solar-icons/react/outline/document";
 import { getLocalDocuments } from "@/features/local-docs/lib/local-doc-store";
 import { migrateLocalDocuments } from "@/features/local-docs/lib/migrate-local-documents";
 import { buttonVariants } from "@/shared/components/ui/button";
@@ -29,11 +29,11 @@ export function MigrationDialog({ onDismiss }: { onDismiss: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/30 p-4">
-      <div className="flex w-full max-w-md flex-col gap-4 rounded-3xl bg-white p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/25 p-4">
+      <div className="flex w-full max-w-md flex-col gap-4 rounded-2xl border border-border bg-surface p-6 shadow-xl">
         <div className="flex flex-col gap-1.5">
-          <h2 className="text-lg font-semibold text-fg-4">Import your drafts?</h2>
-          <p className="text-sm text-fg-3">
+          <h2 className="text-lg font-semibold text-ink">Import your drafts?</h2>
+          <p className="text-sm text-ink-subtle">
             You have {documents.length} draft{documents.length === 1 ? "" : "s"} saved on this
             device. Importing moves {documents.length === 1 ? "it" : "them"} to your workspace so
             you can sync and collaborate.
@@ -44,16 +44,16 @@ export function MigrationDialog({ onDismiss }: { onDismiss: () => void }) {
           {documents.map((document) => (
             <div
               key={document.id}
-              className="flex items-center gap-2.5 rounded-xl border border-bg-3 px-3 py-2 text-sm text-fg-4"
+              className="flex items-center gap-2.5 rounded-xl border border-border px-3 py-2 text-sm text-ink"
             >
-              <DocumentIcon size={15} className="shrink-0 text-fg-3" />
+              <DocumentIcon size={15} className="shrink-0 text-ink-subtle" />
               <span className="truncate">{document.title}</span>
             </div>
           ))}
         </div>
 
         {failedCount > 0 && (
-          <p className="text-xs text-fg-3">
+          <p className="text-xs text-ink-subtle">
             {failedCount} draft{failedCount === 1 ? "" : "s"} couldn&apos;t be imported and
             {failedCount === 1 ? " remains" : " remain"} on this device. You can try again.
           </p>
