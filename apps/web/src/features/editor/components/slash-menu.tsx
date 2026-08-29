@@ -56,7 +56,7 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(function Slash
 
   if (items.length === 0) {
     return (
-      <div className="w-72 rounded-xl border border-bg-3 bg-white p-3 text-sm text-fg-3 shadow-lg">
+      <div className="w-72 rounded-xl border border-border bg-surface p-3 text-sm text-ink-subtle shadow-lg">
         No matching blocks
       </div>
     );
@@ -65,7 +65,7 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(function Slash
   let lastGroup: string | null = null;
 
   return (
-    <div className="max-h-80 w-72 overflow-y-auto rounded-xl border border-bg-3 bg-white p-1 shadow-lg">
+    <div className="max-h-80 w-72 overflow-y-auto rounded-xl border border-border bg-surface p-1 shadow-lg">
       {items.map((item, index) => {
         const showGroup = item.group !== lastGroup;
         lastGroup = item.group;
@@ -74,7 +74,7 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(function Slash
         return (
           <div key={item.title}>
             {showGroup && (
-              <p className="px-2 pt-2 pb-1 text-xs font-medium text-fg-3">{item.group}</p>
+              <p className="px-2 pt-2 pb-1 text-xs font-medium text-ink-subtle">{item.group}</p>
             )}
             <button
               ref={(element) => {
@@ -85,10 +85,10 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(function Slash
               onMouseEnter={() => setSelectedIndex(index)}
               className={cn(
                 "flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm transition-colors",
-                index === selectedIndex ? "bg-bg-3 text-fg-4" : "text-fg-3 hover:text-fg-4",
+                index === selectedIndex ? "bg-surface-active text-ink" : "text-ink-subtle hover:text-ink",
               )}
             >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-bg-3 bg-white">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-surface">
                 <Icon size={15} />
               </span>
               {item.title}

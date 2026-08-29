@@ -21,7 +21,7 @@ export function EditorDragHandle({ editor }: { editor: Editor }) {
         type="button"
         aria-label="Drag to reorder block"
         title="Drag to reorder"
-        className="flex h-6 w-5 cursor-grab items-center justify-center rounded text-fg-3 transition-colors hover:bg-bg-3 hover:text-fg-4 active:cursor-grabbing"
+        className="flex h-6 w-5 cursor-grab items-center justify-center rounded text-ink-subtle transition-colors hover:bg-surface-active hover:text-ink active:cursor-grabbing"
       >
         <GripIcon />
       </button>

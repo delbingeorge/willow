@@ -1,20 +1,20 @@
 import type { ComponentType } from "react";
 import type { Editor, Range } from "@tiptap/core";
-import { TextFieldIcon } from "@solar-icons/react/bold/text-field";
-import { HashtagIcon } from "@solar-icons/react/bold/hashtag";
-import { ListIcon } from "@solar-icons/react/bold/list";
-import { ListArrowDownIcon } from "@solar-icons/react/bold/list-arrow-down";
-import { ChecklistMinimalisticIcon } from "@solar-icons/react/bold/checklist-minimalistic";
-import { CodeSquareIcon } from "@solar-icons/react/bold/code-square";
-import { ChatSquare2Icon } from "@solar-icons/react/bold/chat-square-2";
-import { SortHorizontalIcon } from "@solar-icons/react/bold/sort-horizontal";
-import { Widget4Icon } from "@solar-icons/react/bold/widget-4";
-import { GalleryRoundIcon } from "@solar-icons/react/bold/gallery-round";
-import { LinkIcon } from "@solar-icons/react/bold/link";
-import { InfoCircleIcon } from "@solar-icons/react/bold/info-circle";
-import { DangerTriangleIcon } from "@solar-icons/react/bold/danger-triangle";
-import { CloseCircleIcon } from "@solar-icons/react/bold/close-circle";
-import { CheckCircleIcon } from "@solar-icons/react/bold/check-circle";
+import { TextFieldIcon } from "@solar-icons/react/outline/text-field";
+import { HashtagIcon } from "@solar-icons/react/outline/hashtag";
+import { ListIcon } from "@solar-icons/react/outline/list";
+import { ListArrowDownIcon } from "@solar-icons/react/outline/list-arrow-down";
+import { ChecklistMinimalisticIcon } from "@solar-icons/react/outline/checklist-minimalistic";
+import { CodeSquareIcon } from "@solar-icons/react/outline/code-square";
+import { ChatSquare2Icon } from "@solar-icons/react/outline/chat-square-2";
+import { SortHorizontalIcon } from "@solar-icons/react/outline/sort-horizontal";
+import { Widget4Icon } from "@solar-icons/react/outline/widget-4";
+import { GalleryRoundIcon } from "@solar-icons/react/outline/gallery-round";
+import { LinkIcon } from "@solar-icons/react/outline/link";
+import { InfoCircleIcon } from "@solar-icons/react/outline/info-circle";
+import { DangerTriangleIcon } from "@solar-icons/react/outline/danger-triangle";
+import { CloseCircleIcon } from "@solar-icons/react/outline/close-circle";
+import { CheckCircleIcon } from "@solar-icons/react/outline/check-circle";
 import {
   pickImageFile,
   uploadImage,

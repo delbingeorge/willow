@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Editor } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
-import { TextBoldIcon } from "@solar-icons/react/bold/text-bold";
-import { TextItalicIcon } from "@solar-icons/react/bold/text-italic";
-import { TextUnderlineIcon } from "@solar-icons/react/bold/text-underline";
-import { TextCrossIcon } from "@solar-icons/react/bold/text-cross";
-import { CodeIcon } from "@solar-icons/react/bold/code";
-import { LinkIcon } from "@solar-icons/react/bold/link";
-import { PaletteIcon } from "@solar-icons/react/bold/palette";
-import { AlignLeftIcon } from "@solar-icons/react/bold/align-left";
-import { AlignHorizontalCenterIcon } from "@solar-icons/react/bold/align-horizontal-center";
-import { AlignRightIcon } from "@solar-icons/react/bold/align-right";
-import { CheckCircleIcon } from "@solar-icons/react/bold/check-circle";
+import { TextBoldIcon } from "@solar-icons/react/outline/text-bold";
+import { TextItalicIcon } from "@solar-icons/react/outline/text-italic";
+import { TextUnderlineIcon } from "@solar-icons/react/outline/text-underline";
+import { TextCrossIcon } from "@solar-icons/react/outline/text-cross";
+import { CodeIcon } from "@solar-icons/react/outline/code";
+import { LinkIcon } from "@solar-icons/react/outline/link";
+import { PaletteIcon } from "@solar-icons/react/outline/palette";
+import { AlignLeftIcon } from "@solar-icons/react/outline/align-left";
+import { AlignHorizontalCenterIcon } from "@solar-icons/react/outline/align-horizontal-center";
+import { AlignRightIcon } from "@solar-icons/react/outline/align-right";
+import { CheckCircleIcon } from "@solar-icons/react/outline/check-circle";
 import { cn } from "@/shared/lib/cn";
 import { TEXT_COLORS, HIGHLIGHT_COLORS } from "@/features/editor/lib/highlight-colors";
 
@@ -35,7 +35,7 @@ function ToolbarButton({
       title={label}
       className={cn(
         "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors",
-        active ? "bg-bg-3 text-fg-4" : "text-fg-3 hover:bg-bg-3/60 hover:text-fg-4",
+        active ? "bg-surface-active text-ink" : "text-ink-subtle hover:bg-surface-hover hover:text-ink",
       )}
     >
       {children}
@@ -44,7 +44,7 @@ function ToolbarButton({
 }
 
 function Divider() {
-  return <span className="mx-0.5 h-5 w-px shrink-0 bg-bg-3" aria-hidden="true" />;
+  return <span className="mx-0.5 h-5 w-px shrink-0 bg-surface-active" aria-hidden="true" />;
 }
 
 export function EditorBubbleMenu({ editor }: { editor: Editor }) {
@@ -77,7 +77,7 @@ export function EditorBubbleMenu({ editor }: { editor: Editor }) {
     <BubbleMenu
       editor={editor}
       options={{ placement: "top", onHide: () => setMode("toolbar") }}
-      className="flex items-center gap-0.5 rounded-xl border border-bg-3 bg-white p-1 shadow-lg"
+      className="flex items-center gap-0.5 rounded-xl border border-border bg-surface p-1 shadow-lg"
     >
       {mode === "toolbar" && (
         <>
@@ -175,7 +175,7 @@ export function EditorBubbleMenu({ editor }: { editor: Editor }) {
               }
             }}
             placeholder="Paste a link…"
-            className="h-8 w-56 rounded-lg bg-transparent px-2 text-sm text-fg-4 outline-none placeholder:text-fg-3"
+            className="h-8 w-56 rounded-lg bg-transparent px-2 text-sm text-ink outline-none placeholder:text-ink-subtle"
           />
           <ToolbarButton label="Apply link" onClick={applyLink}>
             <CheckCircleIcon size={16} />
@@ -186,7 +186,7 @@ export function EditorBubbleMenu({ editor }: { editor: Editor }) {
       {mode === "color" && (
         <div className="flex flex-col gap-2 p-1">
           <div className="flex items-center gap-1">
-            <span className="w-16 text-xs text-fg-3">Text</span>
+            <span className="w-16 text-xs text-ink-subtle">Text</span>
             {TEXT_COLORS.map((color) => (
               <button
                 key={color.name}
@@ -202,7 +202,7 @@ export function EditorBubbleMenu({ editor }: { editor: Editor }) {
                   }
                   setMode("toolbar");
                 }}
-                className="h-5 w-5 shrink-0 rounded-full border border-bg-3 text-[10px] font-semibold"
+                className="h-5 w-5 shrink-0 rounded-full border border-border text-[10px] font-semibold"
                 style={color.value ? { color: color.value } : undefined}
               >
                 A
@@ -210,7 +210,7 @@ export function EditorBubbleMenu({ editor }: { editor: Editor }) {
             ))}
           </div>
           <div className="flex items-center gap-1">
-            <span className="w-16 text-xs text-fg-3">Highlight</span>
+            <span className="w-16 text-xs text-ink-subtle">Highlight</span>
             {HIGHLIGHT_COLORS.map((color) => (
               <button
                 key={color.name}
@@ -226,7 +226,7 @@ export function EditorBubbleMenu({ editor }: { editor: Editor }) {
                   }
                   setMode("toolbar");
                 }}
-                className="h-5 w-5 shrink-0 rounded-full border border-bg-3"
+                className="h-5 w-5 shrink-0 rounded-full border border-border"
                 style={color.value ? { backgroundColor: color.value } : undefined}
               />
             ))}

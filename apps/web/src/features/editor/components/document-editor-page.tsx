@@ -19,7 +19,7 @@ export function DocumentEditorPage() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 text-sm text-fg-3">
+      <div className="flex h-full flex-col items-center justify-center gap-3 text-sm text-ink-subtle">
         <p>This document is stored in the cloud.</p>
         <button
           type="button"

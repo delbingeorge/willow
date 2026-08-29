@@ -10,9 +10,10 @@ export function buttonVariants({
   className?: string;
 } = {}) {
   return cn(
-    "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-all active:scale-99",
-    variant === "primary" && "h-8 px-2.5 bg-accent-4 text-black hover:opacity-90",
-    variant === "secondary" && "h-8 px-2.5 bg-neutral-100 text-neutral-700 hover:bg-neutral-200",
+    "inline-flex h-8 select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg px-3 text-[13px] font-medium transition-colors disabled:opacity-50",
+    variant === "primary" && "bg-ink text-surface hover:bg-ink/90",
+    variant === "secondary" &&
+      "border border-border bg-surface text-ink hover:bg-surface-hover",
     className,
   );
 }

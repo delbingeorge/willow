@@ -9,14 +9,26 @@ const CREATE_DOCUMENT_MUTATION = gql`
       title
       icon
       parentId
+      updatedAt
+      isPublished
     }
   }
 `;
 
-export async function createDocument(title = "Untitled") {
+export interface CreateDocumentInput {
+  title?: string;
+  parentId?: string;
+}
+
+export async function createDocument(input: CreateDocumentInput = {}) {
   const { createDocument: document } = await graphqlClient.request<
     { createDocument: DocumentListItem },
-    { input: { title: string } }
-  >(CREATE_DOCUMENT_MUTATION, { input: { title } });
+    { input: { title: string; parentId?: string } }
+  >(CREATE_DOCUMENT_MUTATION, {
+    input: {
+      title: input.title ?? "Untitled",
+      ...(input.parentId ? { parentId: input.parentId } : {}),
+    },
+  });
   return document;
 }

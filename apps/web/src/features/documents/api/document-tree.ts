@@ -9,6 +9,8 @@ const DOCUMENT_TREE_QUERY = gql`
       title
       icon
       parentId
+      updatedAt
+      isPublished
     }
   }
 `;
