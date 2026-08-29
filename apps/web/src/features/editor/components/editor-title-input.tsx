@@ -1,21 +1,19 @@
 import { useEffect, useRef } from "react";
 import type * as Y from "yjs";
 import { useYText } from "@/features/editor/hooks/use-y-text";
-import { useUpdateDocumentTitle } from "@/features/documents/hooks/use-update-document-title";
 
 const PERSIST_DELAY_MS = 600;
 
 export function EditorTitleInput({
   ydoc,
-  documentId,
   readOnly,
+  onPersist,
 }: {
   ydoc: Y.Doc;
-  documentId: string;
   readOnly: boolean;
+  onPersist?: (title: string) => void;
 }) {
   const [title, setTitle] = useYText(ydoc, "title");
-  const updateDocumentTitle = useUpdateDocumentTitle();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
@@ -30,9 +28,13 @@ export function EditorTitleInput({
         const next = event.target.value;
         setTitle(next);
 
+        if (!onPersist) {
+          return;
+        }
+
         clearTimeout(debounceRef.current);
         debounceRef.current = setTimeout(() => {
-          updateDocumentTitle.mutate({ id: documentId, title: next.trim() || "Untitled" });
+          onPersist(next.trim() || "Untitled");
         }, PERSIST_DELAY_MS);
       }}
       placeholder="Untitled"
