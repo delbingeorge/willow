@@ -1,5 +1,6 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import * as Y from 'yjs';
+import type { AuthenticatedUser } from '../auth/types/authenticated-user.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import type { CreateDocumentInput } from './dto/create-document.input.js';
 import type { UpdateDocumentInput } from './dto/update-document.input.js';
@@ -8,6 +9,8 @@ interface DocumentFilters {
   parentId?: string | null;
   isArchived?: boolean;
 }
+
+export type DocumentRole = 'editor' | 'viewer';
 
 export interface SearchRow {
   id: string;
@@ -37,7 +40,7 @@ export class DocumentService {
     });
   }
 
-  async findOne(orgId: string, id: string) {
+  async findInOrg(orgId: string, id: string) {
     const document = await this.prisma.document.findFirst({
       where: { id, orgId },
       include: { creator: true },
@@ -45,6 +48,45 @@ export class DocumentService {
 
     if (!document) {
       throw new NotFoundException('Document not found');
+    }
+
+    return document;
+  }
+
+  async resolveAccess(user: AuthenticatedUser, id: string) {
+    const document = await this.prisma.document.findUnique({
+      where: { id },
+      include: { creator: true },
+    });
+
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
+
+    if (document.orgId === user.orgId) {
+      return { document, role: 'editor' as DocumentRole };
+    }
+
+    const share = await this.prisma.documentShare.findUnique({
+      where: { documentId_userId: { documentId: id, userId: user.id } },
+    });
+
+    if (!share) {
+      throw new NotFoundException('Document not found');
+    }
+
+    return { document, role: (share.role === 'editor' ? 'editor' : 'viewer') as DocumentRole };
+  }
+
+  async findOne(user: AuthenticatedUser, id: string) {
+    return (await this.resolveAccess(user, id)).document;
+  }
+
+  async assertEditAccess(user: AuthenticatedUser, id: string) {
+    const { document, role } = await this.resolveAccess(user, id);
+
+    if (role !== 'editor') {
+      throw new ForbiddenException('You do not have permission to edit this document');
     }
 
     return document;
@@ -92,8 +134,8 @@ export class DocumentService {
     });
   }
 
-  async update(orgId: string, id: string, input: UpdateDocumentInput) {
-    await this.findOne(orgId, id);
+  async update(user: AuthenticatedUser, id: string, input: UpdateDocumentInput) {
+    await this.assertEditAccess(user, id);
 
     return this.prisma.document.update({
       where: { id },
@@ -102,8 +144,8 @@ export class DocumentService {
     });
   }
 
-  async setArchived(orgId: string, id: string, isArchived: boolean) {
-    await this.findOne(orgId, id);
+  async setArchived(user: AuthenticatedUser, id: string, isArchived: boolean) {
+    await this.assertEditAccess(user, id);
 
     return this.prisma.document.update({
       where: { id },
@@ -112,14 +154,14 @@ export class DocumentService {
     });
   }
 
-  async remove(orgId: string, id: string) {
-    await this.findOne(orgId, id);
+  async remove(user: AuthenticatedUser, id: string) {
+    await this.assertEditAccess(user, id);
     await this.prisma.document.delete({ where: { id } });
     return true;
   }
 
   async duplicate(orgId: string, userId: string, id: string) {
-    const original = await this.findOne(orgId, id);
+    const original = await this.findInOrg(orgId, id);
     const position = await this.nextPosition(orgId, original.parentId);
 
     return this.prisma.document.create({
@@ -137,7 +179,7 @@ export class DocumentService {
   }
 
   async move(orgId: string, id: string, parentId: string | null | undefined, position: number) {
-    await this.findOne(orgId, id);
+    await this.findInOrg(orgId, id);
     const nextParentId = parentId ?? null;
 
     if (nextParentId) {
@@ -188,8 +230,8 @@ export class DocumentService {
     }
   }
 
-  async importState(orgId: string, id: string, base64State: string) {
-    await this.findOne(orgId, id);
+  async importState(user: AuthenticatedUser, id: string, base64State: string) {
+    await this.assertEditAccess(user, id);
 
     const state = Buffer.from(base64State, 'base64');
 

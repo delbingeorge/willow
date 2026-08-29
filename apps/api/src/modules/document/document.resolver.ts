@@ -45,7 +45,7 @@ export class DocumentResolver {
     @CurrentUser() user: AuthenticatedUser,
     @Args('id', { type: () => ID }) id: string,
   ) {
-    return this.documentService.findOne(user.orgId, id);
+    return this.documentService.findOne(user, id);
   }
 
   @Query(() => [DocumentModel])
@@ -64,7 +64,7 @@ export class DocumentResolver {
     @Args('id', { type: () => ID }) id: string,
     @Args('state') state: string,
   ) {
-    return this.documentService.importState(user.orgId, id, state);
+    return this.documentService.importState(user, id, state);
   }
 
   @Mutation(() => DocumentModel)
@@ -81,7 +81,7 @@ export class DocumentResolver {
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateDocumentInput,
   ) {
-    return this.documentService.update(user.orgId, id, input);
+    return this.documentService.update(user, id, input);
   }
 
   @Mutation(() => DocumentModel)
@@ -89,7 +89,7 @@ export class DocumentResolver {
     @CurrentUser() user: AuthenticatedUser,
     @Args('id', { type: () => ID }) id: string,
   ) {
-    return this.documentService.setArchived(user.orgId, id, true);
+    return this.documentService.setArchived(user, id, true);
   }
 
   @Mutation(() => DocumentModel)
@@ -97,7 +97,7 @@ export class DocumentResolver {
     @CurrentUser() user: AuthenticatedUser,
     @Args('id', { type: () => ID }) id: string,
   ) {
-    return this.documentService.setArchived(user.orgId, id, false);
+    return this.documentService.setArchived(user, id, false);
   }
 
   @Mutation(() => Boolean)
@@ -105,7 +105,7 @@ export class DocumentResolver {
     @CurrentUser() user: AuthenticatedUser,
     @Args('id', { type: () => ID }) id: string,
   ) {
-    return this.documentService.remove(user.orgId, id);
+    return this.documentService.remove(user, id);
   }
 
   @Mutation(() => DocumentModel)
@@ -132,7 +132,7 @@ export class DocumentResolver {
     @CurrentUser() user: AuthenticatedUser,
     @Args('documentId', { type: () => ID }) documentId: string,
   ) {
-    return this.versionService.create(user.orgId, user.id, documentId);
+    return this.versionService.create(user, documentId);
   }
 
   @Mutation(() => DocumentModel)

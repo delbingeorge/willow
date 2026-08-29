@@ -11,6 +11,7 @@ import { JwtAuthGuard } from './modules/auth/jwt-auth.guard.js';
 import { CollaborationModule } from './modules/collaboration/collaboration.module.js';
 import { DocumentModule } from './modules/document/document.module.js';
 import { OrganizationModule } from './modules/organization/organization.module.js';
+import { UploadModule } from './modules/upload/upload.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
 @Module({
@@ -20,6 +21,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
     DocumentModule,
     CollaborationModule,
     OrganizationModule,
+    UploadModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'schema.graphql'),

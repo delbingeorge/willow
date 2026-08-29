@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Server } from '@hocuspocus/server';
 import * as Y from 'yjs';
 import { AuthService } from '../auth/auth.service.js';
+import { DocumentService } from '../document/document.service.js';
 import { VersionService } from '../document/version.service.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 
@@ -19,6 +20,7 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly authService: AuthService,
+    private readonly documentService: DocumentService,
     private readonly versionService: VersionService,
   ) {}
 
@@ -26,17 +28,12 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
     this.server = new Server({
       port: Number(process.env.COLLAB_PORT ?? 1234),
 
-      onAuthenticate: async ({ token, documentName }) => {
+      onAuthenticate: async ({ token, documentName, connectionConfig }) => {
         const payload = await this.jwtService.verifyAsync<CollabJwtPayload>(token);
         const user = await this.authService.resolveAuthenticatedUser(payload.sub);
 
-        const document = await this.prisma.document.findFirst({
-          where: { id: documentName, orgId: user.orgId },
-        });
-
-        if (!document) {
-          throw new Error('Document not found or access denied');
-        }
+        const { role } = await this.documentService.resolveAccess(user, documentName);
+        connectionConfig.readOnly = role === 'viewer';
 
         return { user };
       },
