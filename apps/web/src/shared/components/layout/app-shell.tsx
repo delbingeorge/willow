@@ -9,7 +9,7 @@ export function AppShell({
   children: ReactNode;
 }) {
   return (
-    <div className="flex h-screen w-screen gap-4 bg-background p-4 text-fg-4">
+    <div className="flex h-screen w-screen gap-2.5 bg-background p-4 text-fg-4">
       <IconRail />
       <aside className="flex w-82 shrink-0 flex-col overflow-y-auto rounded-3xl bg-white p-4">
         {documentList}

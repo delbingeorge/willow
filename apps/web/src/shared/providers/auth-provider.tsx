@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  type ReactNode,
+} from "react";
 import { useDevLogin } from "@/features/auth/hooks/use-dev-login";
 import { setAuthToken } from "@/shared/lib/auth-token";
 import type { DevLoginUser } from "@/features/auth/types";
@@ -41,7 +47,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   if (isError) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-background text-sm text-fg-3">
-        Couldn&apos;t sign in: {error instanceof Error ? error.message : "Unknown error"}
+        Couldn&apos;t sign in:{" "}
+        {error instanceof Error ? error.message : "Unknown error"}
       </div>
     );
   }
