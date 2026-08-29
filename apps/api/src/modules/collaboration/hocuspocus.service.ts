@@ -49,20 +49,34 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
       },
 
       onStoreDocument: async ({ documentName, document }) => {
-        const state = Buffer.from(Y.encodeStateAsUpdate(document));
+        try {
+          const state = Buffer.from(Y.encodeStateAsUpdate(document));
 
-        await this.prisma.documentYjsState.upsert({
-          where: { documentId: documentName },
-          create: { documentId: documentName, state },
-          update: { state },
-        });
+          await this.prisma.documentYjsState.upsert({
+            where: { documentId: documentName },
+            create: { documentId: documentName, state },
+            update: { state },
+          });
 
-        await this.versionService.createAutoVersionIfDue(documentName);
+          await this.versionService.createAutoVersionIfDue(documentName);
+        } catch (error) {
+          // Best-effort persistence: the document may have been deleted while this was
+          // in flight (a foreign key violation on the write below), or the DB may be
+          // briefly unavailable. Either way, this must never crash the whole collab
+          // server for every other connected document.
+          this.logger.error(`onStoreDocument failed for ${documentName}`, error);
+        }
       },
 
       onDisconnect: async ({ documentName, clientsCount }) => {
         if (clientsCount === 0) {
-          await this.versionService.createAutoVersionOnDisconnect(documentName);
+          try {
+            await this.versionService.createAutoVersionOnDisconnect(documentName);
+          } catch (error) {
+            // Same reasoning as onStoreDocument above: the document may already be
+            // gone by the time this runs, and this must stay best-effort.
+            this.logger.error(`onDisconnect version snapshot failed for ${documentName}`, error);
+          }
         }
       },
     });
