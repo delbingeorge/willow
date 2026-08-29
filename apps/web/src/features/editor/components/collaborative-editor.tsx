@@ -1,21 +1,20 @@
 import { useEffect, useState } from "react";
 import * as Y from "yjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
-import { useEditor, EditorContent } from "@tiptap/react";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { getAuthToken } from "@/shared/lib/auth-token";
 import { collabColor } from "@/features/editor/lib/collab-color";
-import { createBlockExtensions } from "@/features/editor/lib/block-extensions";
-import { EditorTitleInput } from "@/features/editor/components/editor-title-input";
-import { EditorBubbleMenu } from "@/features/editor/components/editor-bubble-menu";
-import { EditorDragHandle } from "@/features/editor/components/editor-drag-handle";
+import { EditorShell } from "@/features/editor/components/editor-shell";
+import { useUpdateDocumentTitle } from "@/features/documents/hooks/use-update-document-title";
 
 const COLLAB_URL = import.meta.env.VITE_COLLAB_URL;
 
 export function CollaborativeEditor({ documentId }: { documentId: string }) {
   const { user } = useAuth();
+  const updateDocumentTitle = useUpdateDocumentTitle();
+
   const [ydoc] = useState(() => new Y.Doc());
   const [provider] = useState(
     () =>
@@ -26,46 +25,39 @@ export function CollaborativeEditor({ documentId }: { documentId: string }) {
         token: () => getAuthToken() ?? "",
       }),
   );
+  const [collabExtensions] = useState(() => [
+    Collaboration.configure({ document: ydoc }),
+    CollaborationCaret.configure({
+      provider,
+      user: { name: user.name, color: collabColor(user.id) },
+    }),
+  ]);
   const [isReadOnly, setIsReadOnly] = useState(false);
 
   useEffect(() => {
-    provider.on("authenticated", ({ scope }: { scope: string }) => {
+    const handleAuthenticated = ({ scope }: { scope: string }) => {
       setIsReadOnly(scope === "readonly");
-    });
+    };
+
+    provider.on("authenticated", handleAuthenticated);
 
     return () => {
+      provider.off("authenticated", handleAuthenticated);
       provider.destroy();
     };
   }, [provider]);
 
-  const editor = useEditor({
-    extensions: [
-      ...createBlockExtensions(),
-      Collaboration.configure({ document: ydoc }),
-      CollaborationCaret.configure({
-        provider,
-        user: { name: user.name, color: collabColor(user.id) },
-      }),
-    ],
-  });
-
-  useEffect(() => {
-    editor?.setEditable(!isReadOnly);
-  }, [editor, isReadOnly]);
-
-  if (!editor) {
-    return null;
-  }
-
   return (
-    <div className="flex flex-1 flex-col overflow-y-auto">
-      <EditorTitleInput ydoc={ydoc} documentId={documentId} readOnly={isReadOnly} />
-      {isReadOnly && (
-        <p className="mb-2 text-xs text-fg-3">Viewing only — you don&apos;t have edit access</p>
-      )}
-      {!isReadOnly && <EditorBubbleMenu editor={editor} />}
-      {!isReadOnly && <EditorDragHandle editor={editor} />}
-      <EditorContent editor={editor} />
-    </div>
+    <EditorShell
+      ydoc={ydoc}
+      collabExtensions={collabExtensions}
+      readOnly={isReadOnly}
+      notice={isReadOnly ? "Viewing only — you don't have edit access" : undefined}
+      onPersistTitle={
+        isReadOnly
+          ? undefined
+          : (title) => updateDocumentTitle.mutate({ id: documentId, title })
+      }
+    />
   );
 }
