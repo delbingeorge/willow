@@ -8,6 +8,7 @@ import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { getAuthToken } from "@/shared/lib/auth-token";
 import { collabColor } from "@/features/editor/lib/collab-color";
+import { EditorTitleInput } from "@/features/editor/components/editor-title-input";
 
 const COLLAB_URL = import.meta.env.VITE_COLLAB_URL;
 
@@ -23,8 +24,13 @@ export function CollaborativeEditor({ documentId }: { documentId: string }) {
         token: () => getAuthToken() ?? "",
       }),
   );
+  const [isReadOnly, setIsReadOnly] = useState(false);
 
   useEffect(() => {
+    provider.on("authenticated", ({ scope }: { scope: string }) => {
+      setIsReadOnly(scope === "readonly");
+    });
+
     return () => {
       provider.destroy();
     };
@@ -41,9 +47,21 @@ export function CollaborativeEditor({ documentId }: { documentId: string }) {
     ],
   });
 
+  useEffect(() => {
+    editor?.setEditable(!isReadOnly);
+  }, [editor, isReadOnly]);
+
   if (!editor) {
     return null;
   }
 
-  return <EditorContent editor={editor} className="flex-1 overflow-y-auto" />;
+  return (
+    <div className="flex flex-1 flex-col overflow-y-auto">
+      <EditorTitleInput ydoc={ydoc} documentId={documentId} readOnly={isReadOnly} />
+      {isReadOnly && (
+        <p className="mb-2 text-xs text-fg-3">Viewing only — you don&apos;t have edit access</p>
+      )}
+      <EditorContent editor={editor} />
+    </div>
+  );
 }
