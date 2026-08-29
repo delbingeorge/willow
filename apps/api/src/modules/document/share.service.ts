@@ -15,7 +15,7 @@ export class ShareService {
 
   async share(orgId: string, documentId: string, userId: string, role: string) {
     this.assertValidRole(role);
-    await this.documentService.findOne(orgId, documentId);
+    await this.documentService.findInOrg(orgId, documentId);
 
     const targetUser = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!targetUser) {
@@ -62,7 +62,7 @@ export class ShareService {
   }
 
   async publish(orgId: string, documentId: string) {
-    await this.documentService.findOne(orgId, documentId);
+    await this.documentService.findInOrg(orgId, documentId);
 
     const existing = await this.findPublicShare(documentId);
     if (!existing) {
@@ -84,7 +84,7 @@ export class ShareService {
   }
 
   async unpublish(orgId: string, documentId: string) {
-    await this.documentService.findOne(orgId, documentId);
+    await this.documentService.findInOrg(orgId, documentId);
 
     await this.prisma.documentShare.deleteMany({
       where: { documentId, userId: null },

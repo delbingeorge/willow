@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { AuthenticatedUser } from '../auth/types/authenticated-user.js';
 import type { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { DocumentService } from './document.service.js';
@@ -14,10 +15,10 @@ export class VersionService {
     private readonly documentService: DocumentService,
   ) {}
 
-  async create(orgId: string, userId: string, documentId: string) {
-    const document = await this.documentService.findOne(orgId, documentId);
+  async create(user: AuthenticatedUser, documentId: string) {
+    const document = await this.documentService.assertEditAccess(user, documentId);
     const content = await snapshotYjsContent(this.prisma, documentId);
-    return this.insertVersion(documentId, document.title, userId, content);
+    return this.insertVersion(documentId, document.title, user.id, content);
   }
 
   findMany(documentId: string, limit?: number, offset?: number) {
