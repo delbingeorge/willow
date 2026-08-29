@@ -1,0 +1,21 @@
+@import "tailwindcss";
+@import "./fonts.css";
+
+@theme inline {
+  --font-sans: var(--font-open-runde);
+
+  --color-background: #fbfbfb;
+  --color-fg-3: var(--color-neutral-500);
+  --color-fg-4: var(--color-neutral-950);
+  --color-bg-3: var(--color-neutral-200);
+  --color-accent-2: #d9e2bc;
+  --color-accent-4: #bfcd90;
+  --color-accent-warm: #dba876;
+}
+
+.dark {
+  --color-background: var(--color-neutral-950);
+  --color-fg-3: var(--color-neutral-400);
+  --color-fg-4: var(--color-white);
+  --color-bg-3: var(--color-neutral-800);
+}
