@@ -274,6 +274,9 @@ importers:
       lowlight:
         specifier: ^3.3.0
         version: 3.3.0
+      nanoid:
+        specifier: ^6.0.1
+        version: 6.0.1
       react:
         specifier: ^19.2.8
         version: 19.2.8
@@ -4064,6 +4067,11 @@ packages:
   nanoid@3.3.17:
     resolution: {integrity: sha512-xQLf0A3HOMlgHq0n247/LRuAOYmB7dXJ/DvAxGvsSBij45XtBSmQycu+F8ODbHwns/XyFZagyL1+J0Offw1E0g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
+  nanoid@6.0.1:
+    resolution: {integrity: sha512-3wVS3i51pE2pi1k5FFL/95BGfVS0kSsvDVuGXHOtxox/TywUmtgq+3qiTOTbs9J7KfHaXPiN171k/A6dBnaXFw==}
+    engines: {node: ^22 || ^24 || >=26}
     hasBin: true
 
   natural-compare@1.4.0:
@@ -8561,6 +8569,8 @@ snapshots:
       lru.min: 1.1.4
 
   nanoid@3.3.17: {}
+
+  nanoid@6.0.1: {}
 
   natural-compare@1.4.0: {}
 

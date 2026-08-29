@@ -3,6 +3,7 @@ import * as Y from "yjs";
 import { IndexeddbPersistence } from "y-indexeddb";
 import Collaboration from "@tiptap/extension-collaboration";
 import { EditorShell } from "@/features/editor/components/editor-shell";
+import { renameLocalDocument } from "@/features/local-docs/lib/local-doc-store";
 
 export function LocalEditor({ documentId }: { documentId: string }) {
   const [ydoc] = useState(() => new Y.Doc());
@@ -29,5 +30,11 @@ export function LocalEditor({ documentId }: { documentId: string }) {
     return null;
   }
 
-  return <EditorShell ydoc={ydoc} collabExtensions={collabExtensions} />;
+  return (
+    <EditorShell
+      ydoc={ydoc}
+      collabExtensions={collabExtensions}
+      onPersistTitle={(title) => renameLocalDocument(documentId, title)}
+    />
+  );
 }
