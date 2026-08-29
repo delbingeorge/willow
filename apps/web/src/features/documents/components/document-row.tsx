@@ -2,8 +2,8 @@ import { NavLink } from "react-router";
 import { DocumentIcon } from "@solar-icons/react/outline/document";
 import { DocumentIcon as DocumentIconBold } from "@solar-icons/react/bold/document";
 import { GlobalIcon } from "@solar-icons/react/outline/global";
-import { TrashBinMinimalisticIcon } from "@solar-icons/react/outline/trash-bin-minimalistic";
 import { cn } from "@/shared/lib/cn";
+import { DocumentContextMenu } from "@/features/documents/components/document-context-menu";
 import type { ScopedDocument } from "@/features/documents/lib/scoped-documents";
 
 function relativeTime(iso: string) {
@@ -17,17 +17,17 @@ function relativeTime(iso: string) {
   return `${Math.round(days / 7)}w`;
 }
 
-export function DocumentRow({
-  document,
-  onDelete,
-}: {
-  document: ScopedDocument;
-  onDelete?: () => void;
-}) {
+export function DocumentRow({ document }: { document: ScopedDocument }) {
   const isLocal = document.kind === "local";
 
   return (
-    <div className="group/row relative">
+    <DocumentContextMenu
+      id={document.id}
+      title={document.title}
+      kind={document.kind}
+      isPublished={document.isPublished}
+    >
+      <div className="group/row relative">
       <NavLink
         to={`/documents/${document.id}`}
         className={({ isActive }) =>
@@ -63,29 +63,13 @@ export function DocumentRow({
               <GlobalIcon size={12} className="shrink-0 text-ink-subtle" />
             )}
 
-            <span
-              className={cn(
-                "shrink-0 text-[12px] tabular-nums text-ink-subtle",
-                onDelete && "group-hover/row:invisible",
-              )}
-            >
+            <span className="shrink-0 text-[12px] tabular-nums text-ink-subtle">
               {relativeTime(document.updatedAt)}
             </span>
           </>
         )}
       </NavLink>
-
-      {onDelete && (
-        <button
-          type="button"
-          aria-label={`Delete ${document.title}`}
-          title="Delete from this device"
-          onClick={onDelete}
-          className="absolute top-1.5 right-1.5 hidden h-5 w-5 items-center justify-center rounded text-ink-subtle hover:bg-surface-active hover:text-ink group-hover/row:flex"
-        >
-          <TrashBinMinimalisticIcon size={13} />
-        </button>
-      )}
-    </div>
+      </div>
+    </DocumentContextMenu>
   );
 }

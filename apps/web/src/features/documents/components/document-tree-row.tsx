@@ -6,8 +6,8 @@ import { FolderIcon as FolderIconBold } from "@solar-icons/react/bold/folder";
 import { FolderOpenIcon } from "@solar-icons/react/outline/folder-open";
 import { FolderOpenIcon as FolderOpenIconBold } from "@solar-icons/react/bold/folder-open";
 import { AddCircleIcon } from "@solar-icons/react/outline/add-circle";
-import { TrashBinMinimalisticIcon } from "@solar-icons/react/outline/trash-bin-minimalistic";
 import { cn } from "@/shared/lib/cn";
+import { DocumentContextMenu } from "@/features/documents/components/document-context-menu";
 import type { DocumentTreeNode } from "@/features/documents/lib/scoped-documents";
 
 const INDENT_PX = 16;
@@ -29,20 +29,23 @@ export function DocumentTreeRow({
   expanded,
   onToggle,
   onAddChild,
-  onDelete,
 }: {
   node: DocumentTreeNode;
   expanded: boolean;
   onToggle: () => void;
   onAddChild?: () => void;
-  onDelete?: () => void;
 }) {
   const hasChildren = node.children.length > 0;
   const isLocal = node.kind === "local";
-  const actionCount = (onAddChild ? 1 : 0) + (onDelete ? 1 : 0);
 
   return (
-    <div className="group/row relative">
+    <DocumentContextMenu
+      id={node.id}
+      title={node.title}
+      kind={node.kind}
+      isPublished={node.isPublished}
+    >
+      <div className="group/row relative">
       {Array.from({ length: node.depth }, (_, level) => (
         <span
           key={level}
@@ -115,7 +118,7 @@ export function DocumentTreeRow({
                 <span
                   className={cn(
                     "shrink-0 text-[11px] tabular-nums text-ink-subtle",
-                    actionCount > 0 && "group-hover/row:invisible",
+                    onAddChild && "group-hover/row:invisible",
                   )}
                 >
                   {node.children.length}
@@ -126,32 +129,18 @@ export function DocumentTreeRow({
         }}
       </NavLink>
 
-      {actionCount > 0 && (
-        <span className="absolute top-1 right-1 hidden items-center gap-0.5 group-hover/row:flex">
-          {onAddChild && (
-            <button
-              type="button"
-              aria-label={`Add a page inside ${node.title}`}
-              title="Add a page inside"
-              onClick={onAddChild}
-              className="flex h-5 w-5 items-center justify-center rounded text-ink-subtle hover:bg-surface-active hover:text-ink"
-            >
-              <AddCircleIcon size={13} />
-            </button>
-          )}
-          {onDelete && (
-            <button
-              type="button"
-              aria-label={`Delete ${node.title}`}
-              title="Delete from this device"
-              onClick={onDelete}
-              className="flex h-5 w-5 items-center justify-center rounded text-ink-subtle hover:bg-surface-active hover:text-ink"
-            >
-              <TrashBinMinimalisticIcon size={13} />
-            </button>
-          )}
-        </span>
-      )}
-    </div>
+        {onAddChild && (
+          <button
+            type="button"
+            aria-label={`Add a page inside ${node.title}`}
+            title="Add a page inside"
+            onClick={onAddChild}
+            className="absolute top-1 right-1 hidden h-5 w-5 items-center justify-center rounded text-ink-subtle hover:bg-surface-active hover:text-ink group-hover/row:flex"
+          >
+            <AddCircleIcon size={13} />
+          </button>
+        )}
+      </div>
+    </DocumentContextMenu>
   );
 }

@@ -4,6 +4,7 @@ import { DocumentIcon } from "@solar-icons/react/outline/document";
 import { getLocalDocuments } from "@/features/local-docs/lib/local-doc-store";
 import { migrateLocalDocuments } from "@/features/local-docs/lib/migrate-local-documents";
 import { buttonVariants } from "@/shared/components/ui/button";
+import { toast } from "@/shared/lib/toast";
 
 export function MigrationDialog({ onDismiss }: { onDismiss: () => void }) {
   const [documents, setDocuments] = useState(() => getLocalDocuments());
@@ -21,11 +22,18 @@ export function MigrationDialog({ onDismiss }: { onDismiss: () => void }) {
     setIsImporting(false);
 
     if (failed.length === 0) {
+      toast.success(
+        documents.length === 1 ? "Draft imported" : `${documents.length} drafts imported`,
+      );
       onDismiss();
       return;
     }
     setDocuments(failed);
     setFailedCount(failed.length);
+    toast.error(
+      failed.length === 1 ? "1 draft couldn't be imported" : `${failed.length} drafts couldn't be imported`,
+      "They're still saved on this device.",
+    );
   };
 
   return (

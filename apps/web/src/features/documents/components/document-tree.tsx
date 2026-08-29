@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation } from "react-router";
 import type { DocumentTreeNode } from "@/features/documents/lib/scoped-documents";
 import { DocumentTreeRow } from "@/features/documents/components/document-tree-row";
 import { useCreateDocument } from "@/features/documents/hooks/use-create-document";
-import { deleteLocalDocument } from "@/features/local-docs/lib/local-doc-store";
 
 function findAncestors(nodes: DocumentTreeNode[], targetId: string): string[] | null {
   for (const node of nodes) {
@@ -20,7 +19,6 @@ function findAncestors(nodes: DocumentTreeNode[], targetId: string): string[] | 
 
 export function DocumentTree({ nodes }: { nodes: DocumentTreeNode[] }) {
   const location = useLocation();
-  const navigate = useNavigate();
   const createDocument = useCreateDocument();
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
@@ -42,16 +40,6 @@ export function DocumentTree({ nodes }: { nodes: DocumentTreeNode[] }) {
       return next;
     });
 
-  const handleDelete = async (id: string, title: string) => {
-    if (!window.confirm(`Delete "${title}" from this device?`)) {
-      return;
-    }
-    await deleteLocalDocument(id);
-    if (location.pathname === `/documents/${id}`) {
-      void navigate("/");
-    }
-  };
-
   const render = (list: DocumentTreeNode[]) =>
     list.flatMap((node) => {
       const expanded = isExpanded(node.id);
@@ -65,9 +53,6 @@ export function DocumentTree({ nodes }: { nodes: DocumentTreeNode[] }) {
             node.kind === "cloud"
               ? () => createDocument.mutate({ parentId: node.id })
               : undefined
-          }
-          onDelete={
-            node.kind === "local" ? () => void handleDelete(node.id, node.title) : undefined
           }
         />,
         ...(expanded ? render(node.children) : []),

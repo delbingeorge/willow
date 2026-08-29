@@ -20,6 +20,8 @@ import {
   uploadImage,
   validateImageFile,
 } from "@/features/editor/api/upload-image";
+import { toast } from "@/shared/lib/toast";
+import { promptDialog } from "@/shared/lib/dialog-store";
 
 export interface SlashCommandItem {
   title: string;
@@ -137,7 +139,7 @@ export const SLASH_COMMANDS: SlashCommandItem[] = [
 
         const problem = validateImageFile(file);
         if (problem) {
-          window.alert(problem);
+          toast.error("Couldn't add that image", problem);
           return;
         }
 
@@ -145,7 +147,7 @@ export const SLASH_COMMANDS: SlashCommandItem[] = [
           const { url } = await uploadImage(file);
           editor.chain().focus().setImage({ src: url, alt: file.name }).run();
         } catch {
-          window.alert("Upload failed. Please try again.");
+          toast.error("Upload failed", "Check your connection and try again.");
         }
       })();
     },
@@ -188,12 +190,20 @@ export const SLASH_COMMANDS: SlashCommandItem[] = [
     keywords: ["picture", "photo", "img", "link", "embed", "remote"],
     icon: LinkIcon,
     run: ({ editor, range }) => {
-      const src = window.prompt("Image URL");
-      if (!src) {
-        editor.chain().focus().deleteRange(range).run();
-        return;
-      }
-      editor.chain().focus().deleteRange(range).setImage({ src }).run();
+      editor.chain().focus().deleteRange(range).run();
+
+      void (async () => {
+        const src = await promptDialog({
+          title: "Image from URL",
+          placeholder: "https://…",
+          confirmLabel: "Insert",
+        });
+        const trimmed = src?.trim();
+        if (!trimmed) {
+          return;
+        }
+        editor.chain().focus().setImage({ src: trimmed }).run();
+      })();
     },
   },
 ];
