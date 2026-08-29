@@ -5,6 +5,7 @@ import { MagnifierIcon } from "@solar-icons/react/bold/magnifier";
 import { UsersGroupRoundedIcon } from "@solar-icons/react/bold/users-group-rounded";
 import { ShareIcon } from "@solar-icons/react/bold/share";
 import { SettingsIcon } from "@solar-icons/react/bold/settings";
+import { LoginIcon } from "@solar-icons/react/bold/login";
 import { Logo } from "@/shared/components/logo";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { cn } from "@/shared/lib/cn";
@@ -40,8 +41,7 @@ function RailButton({ icon: Icon, active, ...props }: RailButtonProps) {
 }
 
 export function IconRail() {
-  const { user } = useAuth();
-  const initial = user.name.charAt(0).toUpperCase();
+  const { user, isAuthenticated, isSigningIn, signIn, signOut, error } = useAuth();
 
   return (
     <aside className="flex w-14 shrink-0 flex-col items-center gap-2.5">
@@ -59,9 +59,31 @@ export function IconRail() {
 
       <div className="flex-1" />
 
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-950 text-sm font-semibold text-white">
-        {initial}
-      </div>
+      {isAuthenticated && user ? (
+        <button
+          type="button"
+          onClick={signOut}
+          title={`${user.name} — click to sign out`}
+          aria-label={`Signed in as ${user.name}. Click to sign out.`}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-950 text-sm font-semibold text-white"
+        >
+          {user.name.charAt(0).toUpperCase()}
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={signIn}
+          disabled={isSigningIn}
+          title={error ? `Sign-in failed: ${error}` : "Sign in to sync to the cloud"}
+          aria-label="Sign in"
+          className={cn(
+            "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-fg-3 hover:text-fg-4 disabled:opacity-50",
+            error ? "border-red-300 text-red-500" : "border-bg-3",
+          )}
+        >
+          <LoginIcon size={18} />
+        </button>
+      )}
     </aside>
   );
 }

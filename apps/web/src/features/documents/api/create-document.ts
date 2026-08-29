@@ -13,10 +13,10 @@ const CREATE_DOCUMENT_MUTATION = gql`
   }
 `;
 
-export async function createDocument() {
+export async function createDocument(title = "Untitled") {
   const { createDocument: document } = await graphqlClient.request<
     { createDocument: DocumentListItem },
     { input: { title: string } }
-  >(CREATE_DOCUMENT_MUTATION, { input: { title: "Untitled" } });
+  >(CREATE_DOCUMENT_MUTATION, { input: { title } });
   return document;
 }
