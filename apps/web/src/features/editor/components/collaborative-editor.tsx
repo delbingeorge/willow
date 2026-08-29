@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import * as Y from "yjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { getAuthToken } from "@/shared/lib/auth-token";
 import { collabColor } from "@/features/editor/lib/collab-color";
+import { createBlockExtensions } from "@/features/editor/lib/block-extensions";
 import { EditorTitleInput } from "@/features/editor/components/editor-title-input";
 
 const COLLAB_URL = import.meta.env.VITE_COLLAB_URL;
@@ -38,7 +38,7 @@ export function CollaborativeEditor({ documentId }: { documentId: string }) {
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ undoRedo: false }),
+      ...createBlockExtensions(),
       Collaboration.configure({ document: ydoc }),
       CollaborationCaret.configure({
         provider,
