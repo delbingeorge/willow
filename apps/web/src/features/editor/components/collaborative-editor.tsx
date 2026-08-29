@@ -10,6 +10,7 @@ import { collabColor } from "@/features/editor/lib/collab-color";
 import { createBlockExtensions } from "@/features/editor/lib/block-extensions";
 import { EditorTitleInput } from "@/features/editor/components/editor-title-input";
 import { EditorBubbleMenu } from "@/features/editor/components/editor-bubble-menu";
+import { EditorDragHandle } from "@/features/editor/components/editor-drag-handle";
 
 const COLLAB_URL = import.meta.env.VITE_COLLAB_URL;
 
@@ -63,6 +64,7 @@ export function CollaborativeEditor({ documentId }: { documentId: string }) {
         <p className="mb-2 text-xs text-fg-3">Viewing only — you don&apos;t have edit access</p>
       )}
       {!isReadOnly && <EditorBubbleMenu editor={editor} />}
+      {!isReadOnly && <EditorDragHandle editor={editor} />}
       <EditorContent editor={editor} />
     </div>
   );
