@@ -11,6 +11,7 @@ import { TableKit } from "@tiptap/extension-table/kit";
 import Image from "@tiptap/extension-image";
 import { createLowlight, common } from "lowlight";
 import { SlashCommand } from "@/features/editor/extensions/slash-command";
+import { Callout } from "@/features/editor/extensions/callout";
 
 const lowlight = createLowlight(common);
 
@@ -31,6 +32,7 @@ export function createBlockExtensions() {
     CodeBlockLowlight.configure({ lowlight }),
     TableKit.configure({ table: { resizable: true } }),
     Image,
+    Callout,
     SlashCommand,
   ];
 }

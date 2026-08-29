@@ -11,6 +11,10 @@ import { SortHorizontalIcon } from "@solar-icons/react/bold/sort-horizontal";
 import { Widget4Icon } from "@solar-icons/react/bold/widget-4";
 import { GalleryRoundIcon } from "@solar-icons/react/bold/gallery-round";
 import { LinkIcon } from "@solar-icons/react/bold/link";
+import { InfoCircleIcon } from "@solar-icons/react/bold/info-circle";
+import { DangerTriangleIcon } from "@solar-icons/react/bold/danger-triangle";
+import { CloseCircleIcon } from "@solar-icons/react/bold/close-circle";
+import { CheckCircleIcon } from "@solar-icons/react/bold/check-circle";
 import {
   pickImageFile,
   uploadImage,
@@ -145,6 +149,38 @@ export const SLASH_COMMANDS: SlashCommandItem[] = [
         }
       })();
     },
+  },
+  {
+    title: "Info callout",
+    group: "Callouts",
+    keywords: ["callout", "note", "aside", "tip", "info"],
+    icon: InfoCircleIcon,
+    run: ({ editor, range }) =>
+      editor.chain().focus().deleteRange(range).setCallout({ variant: "info" }).run(),
+  },
+  {
+    title: "Warning callout",
+    group: "Callouts",
+    keywords: ["callout", "caution", "warning", "attention"],
+    icon: DangerTriangleIcon,
+    run: ({ editor, range }) =>
+      editor.chain().focus().deleteRange(range).setCallout({ variant: "warning" }).run(),
+  },
+  {
+    title: "Error callout",
+    group: "Callouts",
+    keywords: ["callout", "error", "danger", "problem", "alert"],
+    icon: CloseCircleIcon,
+    run: ({ editor, range }) =>
+      editor.chain().focus().deleteRange(range).setCallout({ variant: "error" }).run(),
+  },
+  {
+    title: "Success callout",
+    group: "Callouts",
+    keywords: ["callout", "success", "done", "tick", "confirm"],
+    icon: CheckCircleIcon,
+    run: ({ editor, range }) =>
+      editor.chain().focus().deleteRange(range).setCallout({ variant: "success" }).run(),
   },
   {
     title: "Image from URL",
