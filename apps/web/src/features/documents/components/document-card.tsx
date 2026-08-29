@@ -9,16 +9,18 @@ export function DocumentCard({ document }: { document: DocumentListItem }) {
       to={`/documents/${document.id}`}
       className={({ isActive }) =>
         cn(
-          "flex items-center gap-2 rounded-xl border border-bg-3 bg-background px-3 py-2.5 text-sm font-medium shadow-sm transition-colors",
-          isActive ? "text-fg-4" : "text-fg-3 hover:text-fg-4",
+          "flex items-center gap-3 rounded-2xl px-2.5 py-2.5 text-sm font-medium transition-colors",
+          isActive ? "bg-bg-3 text-fg-4" : "text-fg-3 hover:bg-bg-3/50 hover:text-fg-4",
         )
       }
     >
-      {document.icon ? (
-        <span aria-hidden="true">{document.icon}</span>
-      ) : (
-        <DocumentIcon size={16} className="shrink-0 text-fg-3" />
-      )}
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-base shadow-sm">
+        {document.icon ? (
+          <span aria-hidden="true">{document.icon}</span>
+        ) : (
+          <DocumentIcon size={16} className="text-fg-3" />
+        )}
+      </span>
       <span className="truncate">{document.title}</span>
     </NavLink>
   );

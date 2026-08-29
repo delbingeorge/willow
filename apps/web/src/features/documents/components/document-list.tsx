@@ -34,7 +34,7 @@ export function DocumentList() {
         <p className="p-2 text-sm text-fg-3">No documents yet.</p>
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1.5">
         {rootDocuments.map((document) => (
           <DocumentCard key={document.id} document={document} />
         ))}
