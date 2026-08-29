@@ -23,7 +23,7 @@ export function createBlockExtensions() {
     Placeholder.configure({ placeholder: "Start typing…" }),
     TextStyle,
     Color,
-    Highlight,
+    Highlight.configure({ multicolor: true }),
     TextAlign.configure({ types: ["heading", "paragraph"] }),
     TaskList,
     TaskItem.configure({ nested: true }),

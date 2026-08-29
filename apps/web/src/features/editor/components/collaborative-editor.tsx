@@ -9,6 +9,7 @@ import { getAuthToken } from "@/shared/lib/auth-token";
 import { collabColor } from "@/features/editor/lib/collab-color";
 import { createBlockExtensions } from "@/features/editor/lib/block-extensions";
 import { EditorTitleInput } from "@/features/editor/components/editor-title-input";
+import { EditorBubbleMenu } from "@/features/editor/components/editor-bubble-menu";
 
 const COLLAB_URL = import.meta.env.VITE_COLLAB_URL;
 
@@ -61,6 +62,7 @@ export function CollaborativeEditor({ documentId }: { documentId: string }) {
       {isReadOnly && (
         <p className="mb-2 text-xs text-fg-3">Viewing only — you don&apos;t have edit access</p>
       )}
+      {!isReadOnly && <EditorBubbleMenu editor={editor} />}
       <EditorContent editor={editor} />
     </div>
   );
