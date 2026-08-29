@@ -73,7 +73,7 @@ model User {
 
       organization Organization      @relation(fields: [orgId], references: [id])
       creator      User              @relation("Creator", fields: [createdBy], references: [id])
-      parent       Document?         @relation("DocumentTree", fields: [parentId], references: [id])
+      parent       Document?         @relation("DocumentTree", fields: [parentId], references: [id], onDelete: Cascade)
       children     Document[]        @relation("DocumentTree")
       yjsState     DocumentYjsState?
       versions     DocumentVersion[]

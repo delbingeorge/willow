@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./fonts.css";
+@import "gooey-toast/styles.css";
 
 @theme inline {
   --font-sans: var(--font-open-runde);

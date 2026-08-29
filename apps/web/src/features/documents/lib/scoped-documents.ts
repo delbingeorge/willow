@@ -37,6 +37,31 @@ function byNewest(a: ScopedDocument, b: ScopedDocument) {
   return b.updatedAt.localeCompare(a.updatedAt);
 }
 
+export function collectDescendantIds(
+  cloud: DocumentListItem[],
+  rootId: string,
+): string[] {
+  const byParent = new Map<string, string[]>();
+  for (const document of cloud) {
+    if (document.parentId) {
+      byParent.set(document.parentId, [...(byParent.get(document.parentId) ?? []), document.id]);
+    }
+  }
+
+  const found: string[] = [];
+  const walk = (id: string) => {
+    for (const childId of byParent.get(id) ?? []) {
+      if (found.includes(childId)) {
+        continue;
+      }
+      found.push(childId);
+      walk(childId);
+    }
+  };
+  walk(rootId);
+  return found;
+}
+
 export interface DocumentTreeNode extends ScopedDocument {
   depth: number;
   children: DocumentTreeNode[];

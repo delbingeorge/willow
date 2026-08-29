@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { PenNewSquareIcon } from "@solar-icons/react/outline/pen-new-square";
 import { AddCircleIcon } from "@solar-icons/react/outline/add-circle";
 import { useCreateDocument } from "@/features/documents/hooks/use-create-document";
@@ -7,10 +7,7 @@ import { useDocumentTree } from "@/features/documents/hooks/use-document-tree";
 import { useArchivedDocuments } from "@/features/documents/hooks/use-archived-documents";
 import { useDocumentScope } from "@/features/documents/hooks/use-document-scope";
 import { useLocalDocuments } from "@/features/local-docs/hooks/use-local-documents";
-import {
-  createLocalDocument,
-  deleteLocalDocument,
-} from "@/features/local-docs/lib/local-doc-store";
+import { createLocalDocument } from "@/features/local-docs/lib/local-doc-store";
 import {
   selectScopedDocuments,
   buildDocumentTree,
@@ -29,7 +26,6 @@ export function DocumentList() {
   const local = useLocalDocuments();
   const createDocument = useCreateDocument();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const asTree = TREE_SCOPES.has(scope);
 
@@ -47,16 +43,6 @@ export function DocumentList() {
     : [];
 
   const isEmpty = asTree ? treeNodes.length === 0 : documents.length === 0;
-
-  const handleDelete = async (id: string, title: string) => {
-    if (!window.confirm(`Delete "${title}" from this device?`)) {
-      return;
-    }
-    await deleteLocalDocument(id);
-    if (location.pathname === `/documents/${id}`) {
-      void navigate("/");
-    }
-  };
 
   return (
     <div className="flex h-full flex-col">
@@ -106,17 +92,7 @@ export function DocumentList() {
         {asTree ? (
           <DocumentTree nodes={treeNodes} />
         ) : (
-          documents.map((document) => (
-            <DocumentRow
-              key={document.id}
-              document={document}
-              onDelete={
-                document.kind === "local"
-                  ? () => void handleDelete(document.id, document.title)
-                  : undefined
-              }
-            />
-          ))
+          documents.map((document) => <DocumentRow key={document.id} document={document} />)
         )}
       </div>
     </div>
