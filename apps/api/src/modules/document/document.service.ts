@@ -2,6 +2,7 @@ import { BadRequestException, ForbiddenException, Injectable, NotFoundException 
 import * as Y from 'yjs';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
+import { YjsSyncService } from '../collaboration/yjs-sync.service.js';
 import type { CreateDocumentInput } from './dto/create-document.input.js';
 import type { UpdateDocumentInput } from './dto/update-document.input.js';
 
@@ -22,7 +23,10 @@ export interface SearchRow {
 
 @Injectable()
 export class DocumentService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly yjsSync: YjsSyncService,
+  ) {}
 
   findMany(orgId: string, filters: DocumentFilters) {
     return this.prisma.document.findMany({
@@ -137,11 +141,17 @@ export class DocumentService {
   async update(user: AuthenticatedUser, id: string, input: UpdateDocumentInput) {
     await this.assertEditAccess(user, id);
 
-    return this.prisma.document.update({
+    const document = await this.prisma.document.update({
       where: { id },
       data: input,
       include: { creator: true },
     });
+
+    if (input.title !== undefined) {
+      await this.yjsSync.setTitle(id, document.title);
+    }
+
+    return document;
   }
 
   async setArchived(user: AuthenticatedUser, id: string, isArchived: boolean) {
