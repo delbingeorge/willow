@@ -64,7 +64,7 @@ export function DialogHost() {
               type="submit"
               className={cn(
                 buttonVariants({ variant: "primary" }),
-                destructive && "bg-red-600 text-white hover:bg-red-600/90",
+                destructive && "bg-danger-solid text-white hover:bg-danger-solid/90",
               )}
             >
               {request.confirmLabel ?? (isPrompt ? "Save" : "Confirm")}

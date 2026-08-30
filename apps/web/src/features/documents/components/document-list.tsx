@@ -10,6 +10,7 @@ import {
 import { SCOPE_LABELS } from "@/features/documents/lib/document-scope";
 import { DocumentRow } from "@/features/documents/components/document-row";
 import { DocumentTree } from "@/features/documents/components/document-tree";
+import { SkeletonRows } from "@/shared/components/ui/skeleton";
 
 const TREE_SCOPES = new Set(["all"]);
 
@@ -52,9 +53,7 @@ export function DocumentList() {
       </header>
 
       <div className="flex-1 overflow-y-auto p-1">
-        {isLoading && (
-          <p className="px-2.5 py-3 text-[13px] text-ink-subtle">Loading…</p>
-        )}
+        {isLoading && <SkeletonRows count={6} className="px-0.5 py-1" />}
         {isError && (
           <p className="px-2.5 py-3 text-[13px] text-ink-subtle">Couldn&apos;t load documents.</p>
         )}

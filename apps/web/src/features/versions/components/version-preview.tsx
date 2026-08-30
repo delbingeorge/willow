@@ -4,7 +4,7 @@ import { Modal, ModalHeader } from "@/shared/components/ui/modal";
 import { buttonVariants } from "@/shared/components/ui/button";
 import { EditorShell } from "@/features/editor/components/editor-shell";
 import { useVersionContent } from "@/features/versions/hooks/use-document-versions";
-import { buildVersionDoc } from "@/features/versions/lib/version-doc";
+import { buildSnapshotDoc } from "@/features/editor/lib/snapshot-doc";
 import type { SelectedVersion } from "@/features/versions/types";
 
 function PreviewBody({
@@ -16,7 +16,7 @@ function PreviewBody({
 }) {
   const { data, isLoading, isError } = useVersionContent(documentId, version.offset);
 
-  const ydoc = useMemo(() => buildVersionDoc(data?.content), [data]);
+  const ydoc = useMemo(() => buildSnapshotDoc(data?.content), [data]);
   const collabExtensions = useMemo(
     () => (ydoc ? [Collaboration.configure({ document: ydoc })] : []),
     [ydoc],

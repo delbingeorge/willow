@@ -4,6 +4,7 @@ import { transitions } from "@/shared/lib/motion";
 import { relativeTime } from "@/shared/lib/relative-time";
 import { useDocumentVersions } from "@/features/versions/hooks/use-document-versions";
 import type { SelectedVersion } from "@/features/versions/types";
+import { SkeletonRows } from "@/shared/components/ui/skeleton";
 import { cn } from "@/shared/lib/cn";
 
 const PANEL_WIDTH = 260;
@@ -45,9 +46,7 @@ export function VersionPanel({
         </header>
 
         <div className="flex-1 overflow-y-auto p-1">
-          {isLoading && (
-            <p className="px-2.5 py-3 text-[13px] text-ink-subtle">Loading…</p>
-          )}
+          {isLoading && <SkeletonRows count={5} className="px-0.5 py-1" />}
 
           {isError && (
             <p className="px-2.5 py-3 text-[13px] text-ink-subtle">
