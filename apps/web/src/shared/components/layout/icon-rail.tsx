@@ -2,10 +2,6 @@ import type { ComponentType } from "react";
 import { Link } from "react-router";
 import { WidgetIcon } from "@solar-icons/react/outline/widget";
 import { WidgetIcon as WidgetIconBold } from "@solar-icons/react/bold/widget";
-import { ClockCircleIcon } from "@solar-icons/react/outline/clock-circle";
-import { ClockCircleIcon as ClockCircleIconBold } from "@solar-icons/react/bold/clock-circle";
-import { GlobalIcon } from "@solar-icons/react/outline/global";
-import { GlobalIcon as GlobalIconBold } from "@solar-icons/react/bold/global";
 import { ArchiveIcon } from "@solar-icons/react/outline/archive";
 import { ArchiveIcon as ArchiveIconBold } from "@solar-icons/react/bold/archive";
 import { MagnifierIcon } from "@solar-icons/react/outline/magnifier";
@@ -27,7 +23,6 @@ function RailButton({
   activeIcon: ActiveIcon,
   label,
   active,
-  iconClassName,
   onClick,
   comingSoon,
 }: {
@@ -35,7 +30,6 @@ function RailButton({
   activeIcon?: IconComponent;
   label: string;
   active?: boolean;
-  iconClassName?: string;
   onClick?: () => void;
   comingSoon?: boolean;
 }) {
@@ -56,10 +50,7 @@ function RailButton({
           : "hover:bg-surface-hover",
       )}
     >
-      <Glyph
-        size={20}
-        className={cn(iconClassName ?? (active ? "text-ink" : "text-ink-subtle"))}
-      />
+      <Glyph size={20} className={active ? "text-ink" : "text-ink-subtle"} />
     </button>
   );
 }
@@ -77,14 +68,12 @@ export function IconRail() {
     value: DocumentScope,
     icon: IconComponent,
     activeIcon: IconComponent,
-    iconClassName?: string,
   ) => (
     <RailButton
       icon={icon}
       activeIcon={activeIcon}
       label={SCOPE_LABELS[value]}
       active={scope === value}
-      iconClassName={scope === value ? undefined : iconClassName}
       onClick={() => {
         setScope(value);
         expand();
@@ -112,8 +101,6 @@ export function IconRail() {
       <RailDivider />
 
       {scopeButton("all", WidgetIcon, WidgetIconBold)}
-      {scopeButton("recent", ClockCircleIcon, ClockCircleIconBold)}
-      {scopeButton("published", GlobalIcon, GlobalIconBold)}
       {scopeButton("archived", ArchiveIcon, ArchiveIconBold)}
 
       <RailDivider />
