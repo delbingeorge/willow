@@ -3,19 +3,9 @@ import { DocumentIcon } from "@solar-icons/react/outline/document";
 import { DocumentIcon as DocumentIconBold } from "@solar-icons/react/bold/document";
 import { GlobalIcon } from "@solar-icons/react/outline/global";
 import { cn } from "@/shared/lib/cn";
+import { relativeTime } from "@/shared/lib/relative-time";
 import { DocumentContextMenu } from "@/features/documents/components/document-context-menu";
 import type { ScopedDocument } from "@/features/documents/lib/scoped-documents";
-
-function relativeTime(iso: string) {
-  const minutes = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-  if (minutes < 1) return "now";
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h`;
-  const days = Math.round(hours / 24);
-  if (days < 7) return `${days}d`;
-  return `${Math.round(days / 7)}w`;
-}
 
 export function DocumentRow({ document }: { document: ScopedDocument }) {
   return (
