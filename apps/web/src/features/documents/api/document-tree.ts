@@ -9,6 +9,7 @@ const DOCUMENT_TREE_QUERY = gql`
       title
       icon
       parentId
+      position
       updatedAt
       isPublished
     }
