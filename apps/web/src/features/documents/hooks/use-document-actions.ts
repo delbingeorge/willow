@@ -17,6 +17,8 @@ export function useDocumentActions() {
     Promise.all([
       queryClient.invalidateQueries({ queryKey: ["documents", "tree"] }),
       queryClient.invalidateQueries({ queryKey: ["documents", "archived"] }),
+      queryClient.invalidateQueries({ queryKey: ["documents", "sharing"] }),
+      queryClient.invalidateQueries({ queryKey: ["documents", "detail"] }),
     ]);
 
   const settled = (message: string, failure: string) => ({
