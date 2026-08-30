@@ -18,13 +18,10 @@ function relativeTime(iso: string) {
 }
 
 export function DocumentRow({ document }: { document: ScopedDocument }) {
-  const isLocal = document.kind === "local";
-
   return (
     <DocumentContextMenu
       id={document.id}
       title={document.title}
-      kind={document.kind}
       isPublished={document.isPublished}
     >
       <div className="group/row relative">
@@ -43,7 +40,7 @@ export function DocumentRow({ document }: { document: ScopedDocument }) {
               aria-hidden="true"
               className={cn(
                 "flex h-5 w-5 shrink-0 items-center justify-center text-[13px]",
-                isLocal ? "text-signal-local" : isActive ? "text-ink" : "text-ink-subtle",
+                isActive ? "text-ink" : "text-ink-subtle",
               )}
             >
               {document.icon ??

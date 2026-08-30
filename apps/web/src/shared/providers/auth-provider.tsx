@@ -1,31 +1,12 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
 import { useDevLogin } from "@/features/auth/hooks/use-dev-login";
 import { setAuthToken } from "@/shared/lib/auth-token";
-import {
-  hasRememberedSession,
-  rememberSession,
-  forgetSession,
-} from "@/features/auth/lib/session-preference";
+import { buttonVariants } from "@/shared/components/ui/button";
 import type { DevLoginUser } from "@/features/auth/types";
 
 interface AuthContextValue {
   isAuthenticated: boolean;
-  isSigningIn: boolean;
-  justSignedIn: boolean;
-  user: DevLoginUser | null;
-  error: string | null;
-  signIn: () => void;
-  signOut: () => void;
-  acknowledgeSignIn: () => void;
+  user: DevLoginUser;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -39,63 +20,55 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const hasRestored = useRef(false);
-  const queryClient = useQueryClient();
-  const [justSignedIn, setJustSignedIn] = useState(false);
-  const { mutate, data, isPending, isError, error, reset } = useDevLogin();
+  const hasStarted = useRef(false);
+  const { mutate, data, isError, error } = useDevLogin();
 
-  const signIn = useCallback(() => {
+  const signIn = () =>
     mutate(undefined, {
-      onSuccess: (response) => {
-        setAuthToken(response.accessToken);
-        rememberSession();
-        setJustSignedIn(true);
-      },
+      onSuccess: (response) => setAuthToken(response.accessToken),
     });
-  }, [mutate]);
-
-  const signOut = useCallback(() => {
-    setAuthToken(null);
-    forgetSession();
-    setJustSignedIn(false);
-    reset();
-    queryClient.clear();
-  }, [queryClient, reset]);
-
-  const acknowledgeSignIn = useCallback(() => setJustSignedIn(false), []);
 
   useEffect(() => {
-    if (hasRestored.current) {
+    if (hasStarted.current) {
       return;
     }
-    hasRestored.current = true;
-
-    if (!hasRememberedSession()) {
-      return;
-    }
-
+    hasStarted.current = true;
     mutate(undefined, {
-      onSuccess: (response) => {
-        setAuthToken(response.accessToken);
-        rememberSession();
-      },
+      onSuccess: (response) => setAuthToken(response.accessToken),
     });
   }, [mutate]);
 
+  if (data) {
+    return (
+      <AuthContext.Provider value={{ isAuthenticated: true, user: data.user }}>
+        {children}
+      </AuthContext.Provider>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex h-screen w-screen flex-col items-center justify-center gap-4 bg-surface text-center">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-[15px] font-semibold text-ink">Couldn&apos;t sign in</h1>
+          <p className="max-w-sm text-[13px] text-ink-muted">
+            {error instanceof Error ? error.message : "An unexpected error occurred."}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={signIn}
+          className={buttonVariants({ variant: "primary" })}
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated: Boolean(data),
-        isSigningIn: isPending,
-        justSignedIn,
-        user: data?.user ?? null,
-        error: isError ? (error instanceof Error ? error.message : "Sign-in failed") : null,
-        signIn,
-        signOut,
-        acknowledgeSignIn,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <div className="flex h-screen w-screen items-center justify-center bg-surface text-[13px] text-ink-subtle">
+      Loading Willow…
+    </div>
   );
 }
