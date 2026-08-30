@@ -6,6 +6,7 @@ import { AuthService } from '../auth/auth.service.js';
 import { DocumentService } from '../document/document.service.js';
 import { VersionService } from '../document/version.service.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
+import { YjsSyncService } from './yjs-sync.service.js';
 
 interface CollabJwtPayload {
   sub: string;
@@ -22,6 +23,7 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
     private readonly authService: AuthService,
     private readonly documentService: DocumentService,
     private readonly versionService: VersionService,
+    private readonly yjsSync: YjsSyncService,
   ) {}
 
   async onModuleInit() {
@@ -88,6 +90,8 @@ export class HocuspocusService implements OnModuleInit, OnModuleDestroy {
         }
       },
     });
+
+    this.yjsSync.register(this.server);
 
     await this.server.listen();
     this.logger.log(`Hocuspocus listening on port ${this.server.configuration.port}`);
