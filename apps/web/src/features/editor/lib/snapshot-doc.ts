@@ -11,7 +11,7 @@ function decodeBase64(value: string) {
   return bytes;
 }
 
-export function buildVersionDoc(content: unknown): Y.Doc | null {
+export function buildSnapshotDoc(content: unknown): Y.Doc | null {
   const raw = (content as { rawYjsState?: string | null } | null)?.rawYjsState;
 
   if (!raw) {
