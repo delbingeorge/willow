@@ -1,4 +1,4 @@
-export const DOCUMENT_SCOPES = ["all", "recent", "published", "archived"] as const;
+export const DOCUMENT_SCOPES = ["all", "archived"] as const;
 
 export type DocumentScope = (typeof DOCUMENT_SCOPES)[number];
 
@@ -14,7 +14,5 @@ export function parseScope(value: string | null): DocumentScope {
 
 export const SCOPE_LABELS: Record<DocumentScope, string> = {
   all: "All documents",
-  recent: "Recent",
-  published: "Published",
   archived: "Archived",
 };

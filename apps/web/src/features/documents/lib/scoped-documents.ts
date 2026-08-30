@@ -19,10 +19,6 @@ function toScoped(document: DocumentListItem): ScopedDocument {
   };
 }
 
-function byNewest(a: ScopedDocument, b: ScopedDocument) {
-  return b.updatedAt.localeCompare(a.updatedAt);
-}
-
 export function collectDescendantIds(
   cloud: DocumentListItem[],
   rootId: string,
@@ -87,12 +83,8 @@ export function selectScopedDocuments({
   const roots = cloud.filter((document) => document.parentId === null);
 
   switch (scope) {
-    case "published":
-      return cloud.filter((document) => document.isPublished).map(toScoped);
     case "archived":
       return archived.map(toScoped);
-    case "recent":
-      return roots.map(toScoped).sort(byNewest);
     case "all":
     default:
       return roots.map(toScoped);
