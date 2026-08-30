@@ -260,15 +260,25 @@ export class DocumentService {
     return true;
   }
 
-  search(orgId: string, query: string) {
+  async search(orgId: string, query: string) {
+    const term = query.trim();
+
+    if (term.length === 0) {
+      return [];
+    }
+
     return this.prisma.$queryRaw<SearchRow[]>`
       SELECT id, title, icon, updated_at AS "updatedAt",
-             ts_headline('english', title, plainto_tsquery('english', ${query})) AS snippet
+             ts_headline('english', title, plainto_tsquery('english', ${term})) AS snippet
       FROM documents
       WHERE org_id = ${orgId}
         AND is_archived = false
-        AND to_tsvector('english', title) @@ plainto_tsquery('english', ${query})
-      ORDER BY ts_rank(to_tsvector('english', title), plainto_tsquery('english', ${query})) DESC
+        AND (
+          to_tsvector('english', title) @@ plainto_tsquery('english', ${term})
+          OR title ILIKE '%' || ${term} || '%'
+        )
+      ORDER BY ts_rank(to_tsvector('english', title), plainto_tsquery('english', ${term})) DESC,
+               updated_at DESC
       LIMIT 20
     `;
   }
