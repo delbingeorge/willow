@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { WidgetIcon } from "@solar-icons/react/outline/widget";
 import { WidgetIcon as WidgetIconBold } from "@solar-icons/react/bold/widget";
 import { ArchiveIcon } from "@solar-icons/react/outline/archive";
@@ -65,6 +65,7 @@ export function IconRail() {
   const { scope, setScope } = useDocumentScope();
   const { collapsed, toggle, expand } = useListPanel();
   const commandPalette = useCommandPalette();
+  const navigate = useNavigate();
 
   const scopeButton = (
     value: DocumentScope,
@@ -112,9 +113,17 @@ export function IconRail() {
         label="Search"
         onClick={() => commandPalette.setOpen(true)}
       />
-      <RailButton icon={UsersGroupRoundedIcon} label="Members" comingSoon />
+      <RailButton
+        icon={UsersGroupRoundedIcon}
+        label="Members"
+        onClick={() => void navigate("/settings?tab=members")}
+      />
       <RailButton icon={ShareIcon} label="Shared with me" comingSoon />
-      <RailButton icon={SettingsIcon} label="Settings" comingSoon />
+      <RailButton
+        icon={SettingsIcon}
+        label="Settings"
+        onClick={() => void navigate("/settings")}
+      />
 
       <div className="flex-1" />
 
