@@ -12,6 +12,7 @@ import { SidebarMinimalisticIcon } from "@solar-icons/react/outline/sidebar-mini
 import { Logo } from "@/shared/components/logo";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { useListPanel } from "@/shared/hooks/use-list-panel";
+import { useCommandPalette } from "@/shared/hooks/use-command-palette";
 import { useDocumentScope } from "@/features/documents/hooks/use-document-scope";
 import { SCOPE_LABELS, type DocumentScope } from "@/features/documents/lib/document-scope";
 import { cn } from "@/shared/lib/cn";
@@ -63,6 +64,7 @@ export function IconRail() {
   const { user } = useAuth();
   const { scope, setScope } = useDocumentScope();
   const { collapsed, toggle, expand } = useListPanel();
+  const commandPalette = useCommandPalette();
 
   const scopeButton = (
     value: DocumentScope,
@@ -105,7 +107,11 @@ export function IconRail() {
 
       <RailDivider />
 
-      <RailButton icon={MagnifierIcon} label="Search" comingSoon />
+      <RailButton
+        icon={MagnifierIcon}
+        label="Search"
+        onClick={() => commandPalette.setOpen(true)}
+      />
       <RailButton icon={UsersGroupRoundedIcon} label="Members" comingSoon />
       <RailButton icon={ShareIcon} label="Shared with me" comingSoon />
       <RailButton icon={SettingsIcon} label="Settings" comingSoon />
