@@ -38,7 +38,7 @@ export function EditorTitleInput({
         }, PERSIST_DELAY_MS);
       }}
       placeholder="Untitled"
-      className="mb-4 w-full border-none bg-transparent text-2xl font-semibold text-ink outline-none placeholder:text-ink-subtle"
+      className="mb-6 w-full border-none bg-transparent text-[2rem] leading-tight font-semibold tracking-tight text-ink outline-none placeholder:text-ink-subtle"
     />
   );
 }

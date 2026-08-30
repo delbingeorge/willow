@@ -23,6 +23,10 @@ export function ContextMenuContent({
         <Primitive.Popup
           className={cn(
             "min-w-[180px] rounded-xl border border-border bg-surface p-1 shadow-lg outline-none",
+            "origin-[var(--transform-origin)] transition-[opacity,transform] duration-[120ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
+            "data-[starting-style]:scale-[0.97] data-[starting-style]:opacity-0",
+            "data-[ending-style]:scale-[0.97] data-[ending-style]:opacity-0",
+            "motion-reduce:transition-none",
             className,
           )}
           {...props}

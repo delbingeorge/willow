@@ -34,7 +34,7 @@ export function EditorShell({
 
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">
-      <div className="mx-auto w-full max-w-[720px] px-12 py-10">
+      <div className="mx-auto w-full max-w-[860px] px-14 py-14">
         <EditorTitleInput ydoc={ydoc} readOnly={readOnly} onPersist={onPersistTitle} />
         {notice && (
           <p className="mb-4 inline-flex items-center rounded-md bg-surface-active px-2 py-1 text-[12px] text-ink-muted">
