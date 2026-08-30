@@ -7,6 +7,8 @@ import { getAuthToken } from "@/shared/lib/auth-token";
 import type { DevLoginUser } from "@/features/auth/types";
 import { collabColor } from "@/features/editor/lib/collab-color";
 import { EditorShell } from "@/features/editor/components/editor-shell";
+import { EditorHeader } from "@/features/editor/components/editor-header";
+import { useOnlineUsers } from "@/features/editor/hooks/use-online-users";
 import { useUpdateDocumentTitle } from "@/features/documents/hooks/use-update-document-title";
 
 const COLLAB_URL = import.meta.env.VITE_COLLAB_URL;
@@ -38,6 +40,7 @@ export function CollaborativeEditor({
     }),
   ]);
   const [isReadOnly, setIsReadOnly] = useState(false);
+  const onlineUsers = useOnlineUsers(provider);
 
   useEffect(() => {
     const handleAuthenticated = ({ scope }: { scope: string }) => {
@@ -57,6 +60,7 @@ export function CollaborativeEditor({
       ydoc={ydoc}
       collabExtensions={collabExtensions}
       readOnly={isReadOnly}
+      header={<EditorHeader documentId={documentId} users={onlineUsers} />}
       notice={isReadOnly ? "Viewing only — you don't have edit access" : undefined}
       onPersistTitle={
         isReadOnly
