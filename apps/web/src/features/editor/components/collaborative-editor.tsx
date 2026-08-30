@@ -9,6 +9,9 @@ import { collabColor } from "@/features/editor/lib/collab-color";
 import { EditorShell } from "@/features/editor/components/editor-shell";
 import { EditorHeader } from "@/features/editor/components/editor-header";
 import { useOnlineUsers } from "@/features/editor/hooks/use-online-users";
+import { ShareDialog } from "@/features/sharing/components/share-dialog";
+import { useDocument } from "@/features/documents/hooks/use-document";
+import { buttonVariants } from "@/shared/components/ui/button";
 import { useUpdateDocumentTitle } from "@/features/documents/hooks/use-update-document-title";
 
 const COLLAB_URL = import.meta.env.VITE_COLLAB_URL;
@@ -41,6 +44,8 @@ export function CollaborativeEditor({
   ]);
   const [isReadOnly, setIsReadOnly] = useState(false);
   const onlineUsers = useOnlineUsers(provider);
+  const [shareOpen, setShareOpen] = useState(false);
+  const { data: documentMeta } = useDocument(documentId);
 
   useEffect(() => {
     const handleAuthenticated = ({ scope }: { scope: string }) => {
@@ -56,17 +61,39 @@ export function CollaborativeEditor({
   }, [provider]);
 
   return (
-    <EditorShell
-      ydoc={ydoc}
-      collabExtensions={collabExtensions}
-      readOnly={isReadOnly}
-      header={<EditorHeader documentId={documentId} users={onlineUsers} />}
-      notice={isReadOnly ? "Viewing only — you don't have edit access" : undefined}
-      onPersistTitle={
-        isReadOnly
-          ? undefined
-          : (title) => updateDocumentTitle.mutate({ id: documentId, title })
-      }
-    />
+    <>
+      <ShareDialog
+        documentId={documentId}
+        title={documentMeta?.title ?? ""}
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+      />
+      <EditorShell
+        ydoc={ydoc}
+        collabExtensions={collabExtensions}
+        readOnly={isReadOnly}
+        header={
+          <EditorHeader
+            documentId={documentId}
+            users={onlineUsers}
+            actions={
+              <button
+                type="button"
+                onClick={() => setShareOpen(true)}
+                className={buttonVariants({ variant: "secondary", className: "h-7 px-2.5" })}
+              >
+                Share
+              </button>
+            }
+          />
+        }
+        notice={isReadOnly ? "Viewing only — you don't have edit access" : undefined}
+        onPersistTitle={
+          isReadOnly
+            ? undefined
+            : (title) => updateDocumentTitle.mutate({ id: documentId, title })
+        }
+      />
+    </>
   );
 }
