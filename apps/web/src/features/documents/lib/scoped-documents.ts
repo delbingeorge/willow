@@ -81,6 +81,10 @@ export function buildDocumentTree(cloud: DocumentListItem[]): DocumentTreeNode[]
     byParent.set(document.parentId, siblings);
   }
 
+  for (const siblings of byParent.values()) {
+    siblings.sort((a, b) => a.position - b.position);
+  }
+
   const seen = new Set<string>();
 
   const build = (parentId: string | null, depth: number): DocumentTreeNode[] =>
