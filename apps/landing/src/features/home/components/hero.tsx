@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { buttonVariants } from "@/shared/components/ui/button";
+import { APP_URL } from "@/shared/lib/links";
 
 export function Hero() {
   return (
@@ -53,7 +54,7 @@ export function Hero() {
 
       <div className="flex flex-col items-center gap-4 md:flex-row">
         <Link
-          href="/app"
+          href={APP_URL}
           className={buttonVariants({
             variant: "primary",
             className: "h-11 w-[320px] px-5 md:w-auto",
@@ -62,13 +63,13 @@ export function Hero() {
           Start writing
         </Link>
         <Link
-          href="/login"
+          href={APP_URL}
           className={buttonVariants({
             variant: "secondary",
             className: "h-11 w-[320px] px-5 md:w-auto",
           })}
         >
-          Sign in
+          Open Willow
         </Link>
       </div>
     </div>

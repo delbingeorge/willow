@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { buttonVariants } from "../ui/button";
-import { Logo } from "./logo";
+import { buttonVariants } from "@/shared/components/ui/button";
+import { APP_URL } from "@/shared/lib/links";
+import { Logo } from "@/shared/components/navbar/logo";
 
 const navLinks = [
   { label: "Pricing", href: "/pricing" },
@@ -26,10 +27,7 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/get-started"
-            className={buttonVariants({ variant: "primary" })}
-          >
+          <Link href={APP_URL} className={buttonVariants({ variant: "primary" })}>
             Get Started
           </Link>
         </div>
