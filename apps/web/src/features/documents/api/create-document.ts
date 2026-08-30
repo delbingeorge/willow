@@ -9,6 +9,7 @@ const CREATE_DOCUMENT_MUTATION = gql`
       title
       icon
       parentId
+      position
       updatedAt
       isPublished
     }

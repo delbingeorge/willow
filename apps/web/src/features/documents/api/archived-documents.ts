@@ -9,6 +9,7 @@ const ARCHIVED_DOCUMENTS_QUERY = gql`
       title
       icon
       parentId
+      position
       updatedAt
       isPublished
     }

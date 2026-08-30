@@ -1,3 +1,4 @@
+import type { DragEvent } from "react";
 import { NavLink } from "react-router";
 import { DocumentIcon } from "@solar-icons/react/outline/document";
 import { DocumentIcon as DocumentIconBold } from "@solar-icons/react/bold/document";
@@ -9,6 +10,7 @@ import { AddCircleIcon } from "@solar-icons/react/outline/add-circle";
 import { cn } from "@/shared/lib/cn";
 import { DocumentContextMenu } from "@/features/documents/components/document-context-menu";
 import type { DocumentTreeNode } from "@/features/documents/lib/scoped-documents";
+import type { DropZone } from "@/features/documents/lib/tree-move";
 
 const INDENT_PX = 16;
 const ROW_PADDING_PX = 8;
@@ -29,13 +31,39 @@ export function DocumentTreeRow({
   expanded,
   onToggle,
   onAddChild,
+  dragging,
+  dropTargetActive,
+  dropZone,
+  onDragStart,
+  onDragEnd,
+  onDragOverZone,
+  onDropZone,
 }: {
   node: DocumentTreeNode;
   expanded: boolean;
   onToggle: () => void;
   onAddChild?: () => void;
+  dragging: boolean;
+  dropTargetActive: boolean;
+  dropZone: DropZone | null;
+  onDragStart: () => void;
+  onDragEnd: () => void;
+  onDragOverZone: (zone: DropZone) => void;
+  onDropZone: (zone: DropZone) => void;
 }) {
   const hasChildren = node.children.length > 0;
+
+  const zone = (target: DropZone) => ({
+    onDragOver: (event: DragEvent<HTMLSpanElement>) => {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+      onDragOverZone(target);
+    },
+    onDrop: (event: DragEvent<HTMLSpanElement>) => {
+      event.preventDefault();
+      onDropZone(target);
+    },
+  });
 
   return (
     <DocumentContextMenu
@@ -43,7 +71,20 @@ export function DocumentTreeRow({
       title={node.title}
       isPublished={node.isPublished}
     >
-      <div className="group/row relative">
+      <div
+        draggable
+        onDragStart={(event) => {
+          event.dataTransfer.effectAllowed = "move";
+          event.dataTransfer.setData("text/plain", node.id);
+          onDragStart();
+        }}
+        onDragEnd={onDragEnd}
+        className={cn(
+          "group/row relative",
+          dragging && "opacity-40",
+          dropZone === "inside" && "rounded-md bg-accent/10 ring-1 ring-accent/40",
+        )}
+      >
       {Array.from({ length: node.depth }, (_, level) => (
         <span
           key={level}
@@ -53,7 +94,21 @@ export function DocumentTreeRow({
         />
       ))}
 
+      {dropZone === "above" && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute top-0 right-0 left-0 z-10 h-0.5 rounded-full bg-accent"
+        />
+      )}
+      {dropZone === "below" && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute right-0 bottom-0 left-0 z-10 h-0.5 rounded-full bg-accent"
+        />
+      )}
+
       <NavLink
+        draggable={false}
         to={`/documents/${node.id}`}
         style={{ paddingLeft: node.depth * INDENT_PX + ROW_PADDING_PX }}
         className={({ isActive }) =>
@@ -122,6 +177,14 @@ export function DocumentTreeRow({
           );
         }}
       </NavLink>
+
+        {dropTargetActive && (
+          <>
+            <span className="absolute top-0 right-0 left-0 z-20 h-1/4" {...zone("above")} />
+            <span className="absolute top-1/4 right-0 bottom-1/4 left-0 z-20" {...zone("inside")} />
+            <span className="absolute right-0 bottom-0 left-0 z-20 h-1/4" {...zone("below")} />
+          </>
+        )}
 
         {onAddChild && (
           <button

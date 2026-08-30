@@ -3,6 +3,7 @@ export interface DocumentListItem {
   title: string;
   icon: string | null;
   parentId: string | null;
+  position: number;
   updatedAt: string;
   isPublished: boolean;
 }
