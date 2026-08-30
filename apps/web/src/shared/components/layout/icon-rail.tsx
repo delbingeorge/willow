@@ -9,10 +9,14 @@ import { UsersGroupRoundedIcon } from "@solar-icons/react/outline/users-group-ro
 import { ShareIcon } from "@solar-icons/react/outline/share";
 import { SettingsIcon } from "@solar-icons/react/outline/settings";
 import { SidebarMinimalisticIcon } from "@solar-icons/react/outline/sidebar-minimalistic";
+import { SunIcon } from "@solar-icons/react/outline/sun";
+import { MoonIcon } from "@solar-icons/react/outline/moon";
+import { MonitorIcon } from "@solar-icons/react/outline/monitor";
 import { Logo } from "@/shared/components/logo";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { useListPanel } from "@/shared/hooks/use-list-panel";
 import { useCommandPalette } from "@/shared/hooks/use-command-palette";
+import { useTheme } from "@/shared/hooks/use-theme";
 import { useDocumentScope } from "@/features/documents/hooks/use-document-scope";
 import { SCOPE_LABELS, type DocumentScope } from "@/features/documents/lib/document-scope";
 import { cn } from "@/shared/lib/cn";
@@ -66,6 +70,7 @@ export function IconRail() {
   const { collapsed, toggle, expand } = useListPanel();
   const commandPalette = useCommandPalette();
   const navigate = useNavigate();
+  const { theme, cycle } = useTheme();
 
   const scopeButton = (
     value: DocumentScope,
@@ -126,6 +131,18 @@ export function IconRail() {
       />
 
       <div className="flex-1" />
+
+      <RailButton
+        icon={theme === "dark" ? MoonIcon : theme === "light" ? SunIcon : MonitorIcon}
+        label={
+          theme === "system"
+            ? "Theme: match system"
+            : theme === "light"
+              ? "Theme: light"
+              : "Theme: dark"
+        }
+        onClick={cycle}
+      />
 
       <span
         title={user.name}

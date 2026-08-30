@@ -4,7 +4,10 @@ import { openRunde } from "@/shared/lib/fonts";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "Willow Pages",
+  title: {
+    default: "Willow — Build your alter-brain",
+    template: "%s · Willow",
+  },
   description: "Build your alter-brain, for you and your team.",
 };
 

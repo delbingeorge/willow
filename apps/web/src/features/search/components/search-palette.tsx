@@ -8,6 +8,7 @@ import { relativeTime } from "@/shared/lib/relative-time";
 import { useSearch } from "@/features/search/hooks/use-search";
 import { parseHighlight } from "@/features/search/lib/highlight";
 import type { SearchResult } from "@/features/search/types";
+import { SkeletonRows } from "@/shared/components/ui/skeleton";
 import { cn } from "@/shared/lib/cn";
 
 function ResultTitle({ result }: { result: SearchResult }) {
@@ -23,25 +24,13 @@ function ResultTitle({ result }: { result: SearchResult }) {
 }
 
 export function SearchPalette() {
-  const { open, setOpen, toggle } = useCommandPalette();
+  const { open, setOpen } = useCommandPalette();
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   const { results, isLoading, isError, isSettled, enabled } = useSearch(query);
-
-  useEffect(() => {
-    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault();
-        toggle();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [toggle]);
 
   useEffect(() => {
     if (!open) {
@@ -111,9 +100,7 @@ export function SearchPalette() {
           </p>
         )}
 
-        {enabled && isLoading && (
-          <p className="px-2.5 py-6 text-center text-[13px] text-ink-subtle">Searching…</p>
-        )}
+        {enabled && isLoading && <SkeletonRows count={4} className="py-1" />}
 
         {enabled && isError && (
           <p className="px-2.5 py-6 text-center text-[13px] text-ink-subtle">

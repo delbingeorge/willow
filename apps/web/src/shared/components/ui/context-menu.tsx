@@ -48,7 +48,7 @@ export function ContextMenuItem({
         "data-[highlighted]:bg-surface-hover",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         variant === "destructive"
-          ? "text-red-600 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-600"
+          ? "text-danger data-[highlighted]:bg-danger-soft data-[highlighted]:text-danger"
           : "text-ink",
         className,
       )}

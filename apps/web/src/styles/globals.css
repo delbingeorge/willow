@@ -2,19 +2,124 @@
 @import "./fonts.css";
 @import "gooey-toast/styles.css";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
   --font-sans: var(--font-open-runde);
 
-  --color-surface: #ffffff;
-  --color-surface-hover: #f7f7f7;
-  --color-surface-active: #f0f0f0;
-  --color-border: #ebebeb;
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-active: var(--surface-active);
+  --color-border: var(--border);
 
-  --color-ink: #1c1c1c;
-  --color-ink-muted: #6b6b6b;
-  --color-ink-subtle: #9e9e9e;
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
 
-  --color-accent: #3b82f6;
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-solid: var(--danger-solid);
+}
+
+:root {
+  --surface: #ffffff;
+  --surface-hover: #f7f7f7;
+  --surface-active: #f0f0f0;
+  --border: #ebebeb;
+
+  --ink: #1c1c1c;
+  --ink-muted: #6b6b6b;
+  --ink-subtle: #9e9e9e;
+
+  --accent: #3b82f6;
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+  --danger-solid: #dc2626;
+
+  --callout-info-bg: #f0f7fd;
+  --callout-info-border: #c5ddf3;
+  --callout-info-accent: #2b7cc4;
+  --callout-warning-bg: #fdf6e9;
+  --callout-warning-border: #f0dcb0;
+  --callout-warning-accent: #b4791b;
+  --callout-error-bg: #fdf1f0;
+  --callout-error-border: #f2cdc9;
+  --callout-error-accent: #c0453a;
+  --callout-success-bg: #f2f8ec;
+  --callout-success-border: #d3e7bd;
+  --callout-success-accent: #57821f;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: #131417;
+    --surface-hover: #1b1d21;
+    --surface-active: #23262b;
+    --border: #2a2e34;
+
+    --ink: #e9eaec;
+    --ink-muted: #9ba1a9;
+    --ink-subtle: #6d737b;
+
+    --accent: #6ba3f8;
+    --danger: #f0736a;
+    --danger-soft: #2a1917;
+    --danger-solid: #c0392f;
+
+    --callout-info-bg: #14212c;
+    --callout-info-border: #24445a;
+    --callout-info-accent: #6cb6e8;
+    --callout-warning-bg: #251f12;
+    --callout-warning-border: #4a3c1d;
+    --callout-warning-accent: #dda23e;
+    --callout-error-bg: #271917;
+    --callout-error-border: #4e302c;
+    --callout-error-accent: #e8796c;
+    --callout-success-bg: #182315;
+    --callout-success-border: #2f461e;
+    --callout-success-accent: #8fc46a;
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --surface: #131417;
+  --surface-hover: #1b1d21;
+  --surface-active: #23262b;
+  --border: #2a2e34;
+
+  --ink: #e9eaec;
+  --ink-muted: #9ba1a9;
+  --ink-subtle: #6d737b;
+
+  --accent: #6ba3f8;
+  --danger: #f0736a;
+  --danger-soft: #2a1917;
+  --danger-solid: #c0392f;
+
+  --callout-info-bg: #14212c;
+  --callout-info-border: #24445a;
+  --callout-info-accent: #6cb6e8;
+  --callout-warning-bg: #251f12;
+  --callout-warning-border: #4a3c1d;
+  --callout-warning-accent: #dda23e;
+  --callout-error-bg: #271917;
+  --callout-error-border: #4e302c;
+  --callout-error-accent: #e8796c;
+  --callout-success-bg: #182315;
+  --callout-success-border: #2f461e;
+  --callout-success-accent: #8fc46a;
+
+  color-scheme: dark;
+}
+
+body {
+  background: var(--surface);
+  color: var(--ink);
 }
 
 .ProseMirror {
@@ -220,27 +325,27 @@
 }
 
 .editor-callout[data-variant="info"] {
-  --callout-bg: var(--color-sky-50);
-  --callout-border: var(--color-sky-200);
-  --callout-accent: var(--color-sky-600);
+  --callout-bg: var(--callout-info-bg);
+  --callout-border: var(--callout-info-border);
+  --callout-accent: var(--callout-info-accent);
 }
 
 .editor-callout[data-variant="warning"] {
-  --callout-bg: var(--color-amber-50);
-  --callout-border: var(--color-amber-200);
-  --callout-accent: var(--color-amber-600);
+  --callout-bg: var(--callout-warning-bg);
+  --callout-border: var(--callout-warning-border);
+  --callout-accent: var(--callout-warning-accent);
 }
 
 .editor-callout[data-variant="error"] {
-  --callout-bg: var(--color-red-50);
-  --callout-border: var(--color-red-200);
-  --callout-accent: var(--color-red-600);
+  --callout-bg: var(--callout-error-bg);
+  --callout-border: var(--callout-error-border);
+  --callout-accent: var(--callout-error-accent);
 }
 
 .editor-callout[data-variant="success"] {
-  --callout-bg: var(--color-lime-50);
-  --callout-border: var(--color-lime-200);
-  --callout-accent: var(--color-lime-700);
+  --callout-bg: var(--callout-success-bg);
+  --callout-border: var(--callout-success-border);
+  --callout-accent: var(--callout-success-accent);
 }
 
 .editor-callout__icon {
@@ -291,7 +396,7 @@
   line-height: 1;
   user-select: none;
   white-space: nowrap;
-  color: var(--color-white);
+  color: #ffffff;
   padding: 0.1rem 0.3rem;
   border-radius: 3px 3px 3px 0;
   pointer-events: none;
