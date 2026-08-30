@@ -36,13 +36,11 @@ export function DocumentTreeRow({
   onAddChild?: () => void;
 }) {
   const hasChildren = node.children.length > 0;
-  const isLocal = node.kind === "local";
 
   return (
     <DocumentContextMenu
       id={node.id}
       title={node.title}
-      kind={node.kind}
       isPublished={node.isPublished}
     >
       <div className="group/row relative">
@@ -68,11 +66,7 @@ export function DocumentTreeRow({
         {({ isActive }) => {
           const Glyph = pickGlyph(hasChildren, expanded, isActive);
           const glyph = node.icon ?? <Glyph size={15} />;
-          const tone = isLocal
-            ? "text-signal-local"
-            : isActive
-              ? "text-ink"
-              : "text-ink-subtle";
+          const tone = isActive ? "text-ink" : "text-ink-subtle";
 
           return (
             <>

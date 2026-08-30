@@ -49,11 +49,7 @@ export function DocumentTree({ nodes }: { nodes: DocumentTreeNode[] }) {
           node={node}
           expanded={expanded}
           onToggle={() => toggle(node.id)}
-          onAddChild={
-            node.kind === "cloud"
-              ? () => createDocument.mutate({ parentId: node.id })
-              : undefined
-          }
+          onAddChild={() => createDocument.mutate({ parentId: node.id })}
         />,
         ...(expanded ? render(node.children) : []),
       ];

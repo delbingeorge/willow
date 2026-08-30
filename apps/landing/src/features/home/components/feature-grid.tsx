@@ -4,12 +4,6 @@ import { UsersGroupRoundedIcon } from "@solar-icons/react/bold/users-group-round
 
 const features = [
   {
-    icon: BoltIcon,
-    title: "Instant, no signup.",
-    description:
-      "Start writing immediately in your browser. Sign in later to unlock sync and collaboration.",
-  },
-  {
     icon: UsersGroupRoundedIcon,
     title: "Real-time collaboration.",
     description:
@@ -17,9 +11,15 @@ const features = [
   },
   {
     icon: CloudCheckIcon,
-    title: "Works offline.",
+    title: "Everything synced.",
     description:
-      "Guest documents live in your browser and sync the moment you're back online.",
+      "Your workspace lives in the cloud, so every page is current on every device you open it on.",
+  },
+  {
+    icon: BoltIcon,
+    title: "Structure that scales.",
+    description:
+      "Nest pages inside pages, and keep long documents organised without losing your place.",
   },
 ];
 

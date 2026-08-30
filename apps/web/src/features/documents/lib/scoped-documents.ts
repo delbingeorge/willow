@@ -1,35 +1,21 @@
 import type { DocumentListItem } from "@/features/documents/types";
-import type { LocalDocument } from "@/features/local-docs/lib/local-doc-store";
 import type { DocumentScope } from "@/features/documents/lib/document-scope";
 
 export interface ScopedDocument {
   id: string;
   title: string;
   updatedAt: string;
-  kind: "cloud" | "local";
   icon: string | null;
   isPublished: boolean;
 }
 
-function fromCloud(document: DocumentListItem): ScopedDocument {
+function toScoped(document: DocumentListItem): ScopedDocument {
   return {
     id: document.id,
     title: document.title,
     updatedAt: document.updatedAt,
-    kind: "cloud",
     icon: document.icon,
     isPublished: document.isPublished,
-  };
-}
-
-function fromLocal(document: LocalDocument): ScopedDocument {
-  return {
-    id: document.id,
-    title: document.title,
-    updatedAt: document.updatedAt,
-    kind: "local",
-    icon: null,
-    isPublished: false,
   };
 }
 
@@ -67,10 +53,7 @@ export interface DocumentTreeNode extends ScopedDocument {
   children: DocumentTreeNode[];
 }
 
-export function buildDocumentTree(
-  cloud: DocumentListItem[],
-  local: LocalDocument[],
-): DocumentTreeNode[] {
+export function buildDocumentTree(cloud: DocumentListItem[]): DocumentTreeNode[] {
   const byParent = new Map<string | null, DocumentListItem[]>();
   for (const document of cloud) {
     const siblings = byParent.get(document.parentId) ?? [];
@@ -86,41 +69,32 @@ export function buildDocumentTree(
         return [];
       }
       seen.add(document.id);
-      return [{ ...fromCloud(document), depth, children: build(document.id, depth + 1) }];
+      return [{ ...toScoped(document), depth, children: build(document.id, depth + 1) }];
     });
 
-  return [
-    ...build(null, 0),
-    ...local.map((document) => ({ ...fromLocal(document), depth: 0, children: [] })),
-  ];
+  return build(null, 0);
 }
 
 export function selectScopedDocuments({
   scope,
   cloud,
-  local,
   archived,
 }: {
   scope: DocumentScope;
   cloud: DocumentListItem[];
-  local: LocalDocument[];
   archived: DocumentListItem[];
 }): ScopedDocument[] {
   const roots = cloud.filter((document) => document.parentId === null);
 
   switch (scope) {
-    case "cloud":
-      return roots.map(fromCloud);
-    case "local":
-      return local.map(fromLocal);
     case "published":
-      return cloud.filter((document) => document.isPublished).map(fromCloud);
+      return cloud.filter((document) => document.isPublished).map(toScoped);
     case "archived":
-      return archived.map(fromCloud);
+      return archived.map(toScoped);
     case "recent":
-      return [...roots.map(fromCloud), ...local.map(fromLocal)].sort(byNewest);
+      return roots.map(toScoped).sort(byNewest);
     case "all":
     default:
-      return [...roots.map(fromCloud), ...local.map(fromLocal)];
+      return roots.map(toScoped);
   }
 }

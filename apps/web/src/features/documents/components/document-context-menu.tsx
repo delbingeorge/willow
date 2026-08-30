@@ -16,26 +16,19 @@ import {
 } from "@/shared/components/ui/context-menu";
 import { useDocumentActions } from "@/features/documents/hooks/use-document-actions";
 import { useCreateDocument } from "@/features/documents/hooks/use-create-document";
-import {
-  deleteLocalDocument,
-  renameLocalDocument,
-} from "@/features/local-docs/lib/local-doc-store";
 import { useDocumentScope } from "@/features/documents/hooks/use-document-scope";
 import { useDocumentTree } from "@/features/documents/hooks/use-document-tree";
 import { collectDescendantIds } from "@/features/documents/lib/scoped-documents";
-import { toast } from "@/shared/lib/toast";
 import { confirmDialog, promptDialog } from "@/shared/lib/dialog-store";
 
 export function DocumentContextMenu({
   id,
   title,
-  kind,
   isPublished,
   children,
 }: {
   id: string;
   title: string;
-  kind: "cloud" | "local";
   isPublished: boolean;
   children: ReactNode;
 }) {
@@ -47,8 +40,7 @@ export function DocumentContextMenu({
   const location = useLocation();
 
   const isArchivedView = scope === "archived";
-  const descendants =
-    kind === "cloud" ? collectDescendantIds(cloudDocuments ?? [], id) : [];
+  const descendants = collectDescendantIds(cloudDocuments ?? [], id);
 
   const leaveIfAffected = () => {
     const openId = location.pathname.startsWith("/documents/")
@@ -69,12 +61,7 @@ export function DocumentContextMenu({
     if (next === null) {
       return;
     }
-    const trimmed = next.trim() || "Untitled";
-    if (kind === "local") {
-      renameLocalDocument(id, trimmed);
-      return;
-    }
-    actions.rename.mutate({ id, title: trimmed });
+    actions.rename.mutate({ id, title: next.trim() || "Untitled" });
   };
 
   return (
@@ -86,7 +73,7 @@ export function DocumentContextMenu({
           Rename
         </ContextMenuItem>
 
-        {kind === "cloud" && !isArchivedView && (
+        {!isArchivedView && (
           <>
             <ContextMenuItem onClick={() => createDocument.mutate({ parentId: id })}>
               <AddCircleIcon size={14} className="text-ink-subtle" />
@@ -116,7 +103,7 @@ export function DocumentContextMenu({
           </>
         )}
 
-        {kind === "cloud" && isArchivedView && (
+        {isArchivedView && (
           <ContextMenuItem onClick={() => actions.restore.mutate(id)}>
             <RestartIcon size={14} className="text-ink-subtle" />
             Restore
@@ -139,12 +126,6 @@ export function DocumentContextMenu({
               destructive: true,
             });
             if (!confirmed) {
-              return;
-            }
-            if (kind === "local") {
-              await deleteLocalDocument(id);
-              toast.success("Draft deleted");
-              leaveIfAffected();
               return;
             }
             actions.remove.mutate(id, { onSuccess: leaveIfAffected });

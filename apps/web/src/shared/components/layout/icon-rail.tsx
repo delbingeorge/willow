@@ -4,10 +4,6 @@ import { WidgetIcon } from "@solar-icons/react/outline/widget";
 import { WidgetIcon as WidgetIconBold } from "@solar-icons/react/bold/widget";
 import { ClockCircleIcon } from "@solar-icons/react/outline/clock-circle";
 import { ClockCircleIcon as ClockCircleIconBold } from "@solar-icons/react/bold/clock-circle";
-import { CloudIcon } from "@solar-icons/react/outline/cloud";
-import { CloudIcon as CloudIconBold } from "@solar-icons/react/bold/cloud";
-import { PenNewSquareIcon } from "@solar-icons/react/outline/pen-new-square";
-import { PenNewSquareIcon as PenNewSquareIconBold } from "@solar-icons/react/bold/pen-new-square";
 import { GlobalIcon } from "@solar-icons/react/outline/global";
 import { GlobalIcon as GlobalIconBold } from "@solar-icons/react/bold/global";
 import { ArchiveIcon } from "@solar-icons/react/outline/archive";
@@ -16,7 +12,6 @@ import { MagnifierIcon } from "@solar-icons/react/outline/magnifier";
 import { UsersGroupRoundedIcon } from "@solar-icons/react/outline/users-group-rounded";
 import { ShareIcon } from "@solar-icons/react/outline/share";
 import { SettingsIcon } from "@solar-icons/react/outline/settings";
-import { LoginIcon } from "@solar-icons/react/outline/login";
 import { SidebarMinimalisticIcon } from "@solar-icons/react/outline/sidebar-minimalistic";
 import { Logo } from "@/shared/components/logo";
 import { useAuth } from "@/shared/providers/auth-provider";
@@ -74,7 +69,7 @@ function RailDivider() {
 }
 
 export function IconRail() {
-  const { user, isAuthenticated, isSigningIn, signIn, signOut, error } = useAuth();
+  const { user } = useAuth();
   const { scope, setScope } = useDocumentScope();
   const { collapsed, toggle, expand } = useListPanel();
 
@@ -118,11 +113,8 @@ export function IconRail() {
 
       {scopeButton("all", WidgetIcon, WidgetIconBold)}
       {scopeButton("recent", ClockCircleIcon, ClockCircleIconBold)}
-      {isAuthenticated &&
-        scopeButton("cloud", CloudIcon, CloudIconBold, "text-signal-synced")}
-      {scopeButton("local", PenNewSquareIcon, PenNewSquareIconBold, "text-signal-local")}
-      {isAuthenticated && scopeButton("published", GlobalIcon, GlobalIconBold)}
-      {isAuthenticated && scopeButton("archived", ArchiveIcon, ArchiveIconBold)}
+      {scopeButton("published", GlobalIcon, GlobalIconBold)}
+      {scopeButton("archived", ArchiveIcon, ArchiveIconBold)}
 
       <RailDivider />
 
@@ -133,33 +125,13 @@ export function IconRail() {
 
       <div className="flex-1" />
 
-      {isAuthenticated && user ? (
-        <button
-          type="button"
-          onClick={signOut}
-          title={`${user.name} — click to sign out`}
-          aria-label={`Signed in as ${user.name}. Click to sign out.`}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink text-[13px] font-semibold text-surface"
-        >
-          {user.name.charAt(0).toUpperCase()}
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={signIn}
-          disabled={isSigningIn}
-          title={error ? `Sign-in failed: ${error}` : "Sign in to sync to the cloud"}
-          aria-label="Sign in"
-          className={cn(
-            "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors disabled:opacity-50",
-            error
-              ? "border-red-200 text-red-500"
-              : "border-border text-ink-subtle hover:text-ink",
-          )}
-        >
-          <LoginIcon size={16} />
-        </button>
-      )}
+      <span
+        title={user.name}
+        aria-label={`Signed in as ${user.name}`}
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink text-[13px] font-semibold text-surface"
+      >
+        {user.name.charAt(0).toUpperCase()}
+      </span>
     </aside>
   );
 }
