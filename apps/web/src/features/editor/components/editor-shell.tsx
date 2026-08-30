@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import type * as Y from "yjs";
 import type { Extensions } from "@tiptap/core";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -13,12 +13,14 @@ export function EditorShell({
   readOnly = false,
   onPersistTitle,
   notice,
+  header,
 }: {
   ydoc: Y.Doc;
   collabExtensions: Extensions;
   readOnly?: boolean;
   onPersistTitle?: (title: string) => void;
   notice?: string;
+  header?: ReactNode;
 }) {
   const editor = useEditor({
     extensions: [...createBlockExtensions(), ...collabExtensions],
@@ -34,6 +36,7 @@ export function EditorShell({
 
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">
+      {header}
       <div className="mx-auto w-full max-w-[860px] px-14 py-14">
         <EditorTitleInput ydoc={ydoc} readOnly={readOnly} onPersist={onPersistTitle} />
         {notice && (

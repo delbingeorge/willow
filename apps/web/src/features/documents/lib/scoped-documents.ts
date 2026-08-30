@@ -44,6 +44,30 @@ export function collectDescendantIds(
   return found;
 }
 
+export interface BreadcrumbEntry {
+  id: string;
+  title: string;
+}
+
+export function buildBreadcrumb(
+  cloud: DocumentListItem[],
+  documentId: string,
+): BreadcrumbEntry[] {
+  const byId = new Map(cloud.map((document) => [document.id, document]));
+  const path: BreadcrumbEntry[] = [];
+  const seen = new Set<string>();
+
+  let current = byId.get(documentId);
+
+  while (current && !seen.has(current.id)) {
+    seen.add(current.id);
+    path.unshift({ id: current.id, title: current.title });
+    current = current.parentId ? byId.get(current.parentId) : undefined;
+  }
+
+  return path;
+}
+
 export interface DocumentTreeNode extends ScopedDocument {
   depth: number;
   children: DocumentTreeNode[];
