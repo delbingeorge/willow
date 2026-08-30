@@ -77,7 +77,7 @@ export function EditorBubbleMenu({ editor }: { editor: Editor }) {
     <BubbleMenu
       editor={editor}
       options={{ placement: "top", onHide: () => setMode("toolbar") }}
-      className="flex items-center gap-0.5 rounded-xl border border-border bg-surface p-1 shadow-lg"
+      className="editor-pop flex items-center gap-0.5 rounded-xl border border-border bg-surface p-1 shadow-lg"
     >
       {mode === "toolbar" && (
         <>

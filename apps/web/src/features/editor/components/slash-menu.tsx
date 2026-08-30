@@ -56,7 +56,7 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(function Slash
 
   if (items.length === 0) {
     return (
-      <div className="w-72 rounded-xl border border-border bg-surface p-3 text-sm text-ink-subtle shadow-lg">
+      <div className="editor-pop w-72 rounded-xl border border-border bg-surface p-3 text-sm text-ink-subtle shadow-lg">
         No matching blocks
       </div>
     );
@@ -65,7 +65,7 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(function Slash
   let lastGroup: string | null = null;
 
   return (
-    <div className="max-h-80 w-72 overflow-y-auto rounded-xl border border-border bg-surface p-1 shadow-lg">
+    <div className="editor-pop max-h-80 w-72 overflow-y-auto rounded-xl border border-border bg-surface p-1 shadow-lg">
       {items.map((item, index) => {
         const showGroup = item.group !== lastGroup;
         lastGroup = item.group;

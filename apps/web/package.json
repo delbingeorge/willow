@@ -33,6 +33,7 @@
     "@tiptap/starter-kit": "3.30.5",
     "@tiptap/suggestion": "3.30.5",
     "clsx": "^2.1.1",
+    "framer-motion": "^13.1.1",
     "gooey-toast": "^0.2.2",
     "graphql": "^16.9.0",
     "graphql-request": "^7.1.2",
