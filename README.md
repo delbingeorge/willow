@@ -1,159 +1,101 @@
-# Turborepo starter
+# Willow
 
-This Turborepo starter is maintained by the Turborepo core team.
+A collaborative block editor. Multiple people edit the same document at once, with cursor
+presence, nested pages, sharing, and version history.
 
-## Using this example
+## Stack
 
-Run the following command:
+| Layer | Choice |
+|---|---|
+| Monorepo | Turborepo + pnpm workspaces |
+| API | NestJS, GraphQL (Apollo), Prisma 7 with the `pg` driver adapter |
+| Database | PostgreSQL |
+| Collaboration | Yjs CRDTs over a Hocuspocus WebSocket server |
+| Editor | Tiptap 3 / ProseMirror |
+| App | React 19, Vite, TanStack Query, Tailwind v4, Base UI |
+| Marketing site | Next.js |
+| File storage | S3-compatible (Cloudflare R2) |
 
-```sh
-npx create-turbo@latest
+## Layout
+
+```
+apps/
+  api/       NestJS GraphQL API + Hocuspocus collaboration server
+  web/       The editor application (Vite SPA)
+  landing/   Marketing site (Next.js)
+packages/    Shared TypeScript and lint config
 ```
 
-## What's inside?
+## Running locally
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `@next/eslint-plugin-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+Requires Node 24+, pnpm 11+, and Docker for Postgres.
 
 ```sh
-cd my-turborepo
-turbo build
+pnpm install
+docker compose up -d
+
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env
+
+pnpm --filter api exec prisma migrate dev
+pnpm dev
 ```
 
-Without global `turbo`, use your package manager:
+- API — http://localhost:3000 (GraphQL at `/graphql`)
+- Collaboration — ws://localhost:1234
+- App — http://localhost:3001
+
+The API listens on **two ports**: HTTP for GraphQL and REST, and a separate WebSocket port for
+Hocuspocus. Both must be reachable from the browser.
+
+Authentication is a development stand-in — `POST /auth/dev-login` returns a JWT for a seeded
+user. Google and Apple OAuth are intentionally not built yet.
+
+## Deploying
+
+### API → Fly.io
 
 ```sh
-cd my-turborepo
-npx turbo build
-pnpm exec turbo build
-pnpm exec turbo build
+cd apps/api
+fly launch --no-deploy      # or: fly apps create willow-api
+fly secrets set DATABASE_URL="..." JWT_SECRET="..." WEB_ORIGIN="https://your-app.vercel.app"
+fly secrets set STORAGE_ENDPOINT="..." STORAGE_BUCKET="..." \
+  STORAGE_ACCESS_KEY_ID="..." STORAGE_SECRET_ACCESS_KEY="..." \
+  STORAGE_PUBLIC_URL_BASE="..." STORAGE_REGION="auto"
+fly deploy
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+`fly.toml` exposes HTTP on 443 and the collaboration WebSocket on **8443**, because Fly cannot
+route two services through the same external port. Migrations run automatically on deploy via
+`release_command`.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+**The app is pinned to a single machine** (`min_machines_running = 1`,
+`auto_stop_machines = "off"`). Hocuspocus keeps each document in memory on the instance that
+loaded it, so two people routed to different machines would not see each other's edits.
+Scaling past one machine requires `@hocuspocus/extension-redis` and a Redis instance.
+
+### App → Vercel
+
+Set the project's **Root Directory** to `apps/web`, then add:
+
+```
+VITE_API_URL     = https://willow-api.fly.dev
+VITE_COLLAB_URL  = wss://willow-api.fly.dev:8443
+```
+
+Both are inlined at build time, so changing them needs a redeploy. `vercel.json` rewrites all
+paths to `index.html` so client-side routes survive a hard refresh.
+
+### Database
+
+Any managed Postgres works — Neon and Supabase are the usual choices. Point `DATABASE_URL` at
+it and `release_command` applies migrations on the next deploy.
+
+## Scripts
 
 ```sh
-turbo build --filter=docs
+pnpm dev           # all apps
+pnpm build         # all apps
+pnpm lint
+pnpm check-types
 ```
-
-Without global `turbo`:
-
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)

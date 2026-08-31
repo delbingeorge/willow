@@ -26,6 +26,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'schema.graphql'),
       sortSchema: true,
+      includeStacktraceInErrorResponses: process.env.NODE_ENV !== 'production',
     }),
   ],
   controllers: [AppController],
