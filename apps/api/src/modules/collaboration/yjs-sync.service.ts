@@ -1,24 +1,24 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { Server } from '@hocuspocus/server';
+import type { Document, Hocuspocus } from '@hocuspocus/server';
 
 @Injectable()
 export class YjsSyncService {
   private readonly logger = new Logger(YjsSyncService.name);
-  private server: Server | undefined;
+  private hocuspocus: Hocuspocus | undefined;
 
-  register(server: Server) {
-    this.server = server;
+  register(hocuspocus: Hocuspocus) {
+    this.hocuspocus = hocuspocus;
   }
 
   async setTitle(documentId: string, title: string) {
-    if (!this.server) {
+    if (!this.hocuspocus) {
       return;
     }
 
     try {
-      const connection = await this.server.openDirectConnection(documentId);
+      const connection = await this.hocuspocus.openDirectConnection(documentId);
       try {
-        await connection.transact((document) => {
+        await connection.transact((document: Document) => {
           const text = document.getText('title');
           if (text.toString() === title) {
             return;

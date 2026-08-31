@@ -42,54 +42,68 @@ pnpm dev
 ```
 
 - API — http://localhost:3000 (GraphQL at `/graphql`)
-- Collaboration — ws://localhost:1234
+- Collaboration — ws://localhost:3000/collaboration
 - App — http://localhost:3001
 
-The API listens on **two ports**: HTTP for GraphQL and REST, and a separate WebSocket port for
-Hocuspocus. Both must be reachable from the browser.
+The API listens on **one port**. GraphQL and REST are served over HTTP; the Yjs collaboration
+WebSocket is mounted on the same server at `/collaboration`.
 
 Authentication is a development stand-in — `POST /auth/dev-login` returns a JWT for a seeded
 user. Google and Apple OAuth are intentionally not built yet.
 
 ## Deploying
 
-### API → Fly.io
+### API → Render
+
+The API is a single Docker service on one port: GraphQL and REST over HTTP, and the Yjs
+collaboration WebSocket at **`/collaboration`** on the same port.
+
+1. Create a Postgres database at [Neon](https://neon.tech) and copy the pooled connection string.
+2. Create an R2 bucket and an API token with Object Read & Write.
+3. In Render: **New → Blueprint**, point it at this repo. `render.yaml` defines the service.
+4. Fill in the secrets Render marks as required: `DATABASE_URL`, `WEB_ORIGIN`, and the
+   `STORAGE_*` values. `JWT_SECRET` is generated for you.
+5. Apply migrations once from your machine, against the same database:
 
 ```sh
-cd apps/api
-fly launch --no-deploy      # or: fly apps create willow-api
-fly secrets set DATABASE_URL="..." JWT_SECRET="..." WEB_ORIGIN="https://your-app.vercel.app"
-fly secrets set STORAGE_ENDPOINT="..." STORAGE_BUCKET="..." \
-  STORAGE_ACCESS_KEY_ID="..." STORAGE_SECRET_ACCESS_KEY="..." \
-  STORAGE_PUBLIC_URL_BASE="..." STORAGE_REGION="auto"
-fly deploy
+DATABASE_URL="<neon-url>" pnpm --filter api exec prisma migrate deploy
 ```
 
-`fly.toml` exposes HTTP on 443 and the collaboration WebSocket on **8443**, because Fly cannot
-route two services through the same external port. Migrations run automatically on deploy via
-`release_command`.
+Render's free plan has no pre-deploy hook, so migrations are a manual step. Re-run that command
+whenever you add a migration.
 
-**The app is pinned to a single machine** (`min_machines_running = 1`,
-`auto_stop_machines = "off"`). Hocuspocus keeps each document in memory on the instance that
-loaded it, so two people routed to different machines would not see each other's edits.
-Scaling past one machine requires `@hocuspocus/extension-redis` and a Redis instance.
+**The free plan sleeps after ~15 minutes idle** and cold-starts slowly. Live collaboration
+reconnects once the service wakes, but the first request after a sleep is slow.
 
-### App → Vercel
+### App → Cloudflare Pages
 
-Set the project's **Root Directory** to `apps/web`, then add:
+**Workers & Pages → Create → Pages → Connect to Git.**
+
+| Setting | Value |
+|---|---|
+| Build command | `pnpm install --frozen-lockfile && pnpm --filter web run build` |
+| Build output directory | `apps/web/dist` |
+| Root directory | *(leave empty — pnpm needs the workspace root)* |
+
+Environment variables:
 
 ```
-VITE_API_URL     = https://willow-api.fly.dev
-VITE_COLLAB_URL  = wss://willow-api.fly.dev:8443
+NODE_VERSION     = 24
+VITE_API_URL     = https://willow-api.onrender.com
+VITE_COLLAB_URL  = wss://willow-api.onrender.com/collaboration
 ```
 
-Both are inlined at build time, so changing them needs a redeploy. `vercel.json` rewrites all
-paths to `index.html` so client-side routes survive a hard refresh.
+Both `VITE_*` values are inlined at build time, so changing one needs a redeploy.
+`public/_redirects` rewrites every path to `index.html` so client-side routes survive a refresh.
 
-### Database
+### Landing → a second Pages project
 
-Any managed Postgres works — Neon and Supabase are the usual choices. Point `DATABASE_URL` at
-it and `release_command` applies migrations on the next deploy.
+Same flow, with `pnpm --filter landing run build` and an output directory of `apps/landing/out`.
+The site is a static export (`output: "export"`), so it needs no server runtime.
+
+### After the first deploy
+
+Set `WEB_ORIGIN` on Render to the app's real URL, or CORS will reject every request.
 
 ## Scripts
 
