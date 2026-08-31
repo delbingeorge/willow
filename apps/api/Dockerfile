@@ -1,7 +1,10 @@
 FROM node:24-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+RUN corepack enable \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 FROM base AS manifests
@@ -26,7 +29,6 @@ RUN pnpm install --frozen-lockfile --prod --filter api...
 FROM base AS runtime
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV COLLAB_PORT=1234
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
@@ -35,5 +37,5 @@ COPY --from=build /app/apps/api/prisma ./apps/api/prisma
 COPY --from=build /app/apps/api/package.json ./apps/api/package.json
 
 WORKDIR /app/apps/api
-EXPOSE 3000 1234
+EXPOSE 3000
 CMD ["node", "dist/main.js"]
