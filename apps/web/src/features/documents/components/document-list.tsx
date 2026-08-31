@@ -42,7 +42,7 @@ export function DocumentList() {
         </span>
         <button
           type="button"
-          onClick={() => createDocument.mutate()}
+          onClick={() => createDocument.mutate({})}
           disabled={createDocument.isPending}
           aria-label="New document"
           title="New document"

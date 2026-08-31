@@ -23,7 +23,7 @@ export function DocumentsPage() {
           <h1 className="text-[22px] font-semibold tracking-tight text-ink">All documents</h1>
           <button
             type="button"
-            onClick={() => createDocument.mutate()}
+            onClick={() => createDocument.mutate({})}
             disabled={createDocument.isPending}
             className={buttonVariants({ variant: "primary", className: "shrink-0" })}
           >
